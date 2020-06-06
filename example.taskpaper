@@ -1,0 +1,26 @@
+Reading:
+	- it can read a file
+	- it can parse header lines
+	- it can parse task lines
+	- it can parse comments
+
+	Nested projects:
+		- it can parse them
+		- it can show the "path" to a task
+
+	Tasks:
+		- have tags @like-this @and-this
+		- have tags with values @like(this value) @and-like(these,values)
+
+	Notes:
+		I'm not sure what the spec says, but I would want notes to be
+		associated with a project and be multiline.  So this would all be
+		one note under the "Notes" project under the "Reading" project.
+
+		- projects can have notes
+			(see above)
+
+		- tasks can have notes, too
+			see above
+
+		This is another note in the project.  Order is important.
