@@ -136,9 +136,4 @@ function taskpaper.parse_note (line)
   end
 end
 
---local testfile = io.open("file.taskpaper", "r")
---for line in testfile:lines() do
-  --print("passing line through:", line)
---end
-
 return taskpaper
