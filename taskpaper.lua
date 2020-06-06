@@ -10,7 +10,7 @@ function taskpaper.parse_header (line)
   -- The header name is everything from the first non-space character
   -- to the the colon.  If the line ends in anything but a colon,
   -- then it's not a header line.
-  local first, last = line:find('%S.+:$')
+  local first = line:find('%S.+:$')
 
   if first then
     local depth = first

@@ -6,18 +6,18 @@ local taskpaper = require 'taskpaper'
 -- These let you do something like `map(enquote, list_of_strings)` to
 -- make string comparisons more clear when they involve leading or
 -- trailing whitespace.
-function map (f, xs)
-  results = {}
+local function map (f, xs)
+  local results = {}
   for i = 1, #xs do
     results[i] = f(xs[i])
   end
   return results
 end
-function enquote(str)
+local function enquote(str)
   return string.format("'%s'", str)
 end
 
-describe('taskpaper parser', function ()
+describe('line-level taskpaper parser', function ()
   describe('headers', function ()
     local parse = taskpaper.parse_header
 
@@ -29,7 +29,7 @@ describe('taskpaper parser', function ()
         "- I am a task.",
       }
 
-      for i, not_header in ipairs(not_headers) do
+      for _, not_header in ipairs(not_headers) do
         expect(parse(not_header)).to_not.exist()
       end
     end)
@@ -139,7 +139,7 @@ describe('taskpaper parser', function ()
         end
 
         -- Also make sure that we didn't parse any _extra_ tags.
-        for tag, value in pairs(tags) do
+        for tag, _ in pairs(tags) do
           expect(expected_tags[tag]).to.exist()
         end
       end
