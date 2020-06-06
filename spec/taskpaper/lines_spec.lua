@@ -1,7 +1,4 @@
-local lust = require 'lust'
-local describe, it, expect = lust.describe, lust.it, lust.expect
-
-local taskpaper = require 'taskpaper'
+local taskpaper = require 'taskpaper/lines'
 
 -- These let you do something like `map(enquote, list_of_strings)` to
 -- make string comparisons more clear when they involve leading or
@@ -30,7 +27,7 @@ describe('line-level taskpaper parser', function ()
       }
 
       for _, not_header in ipairs(not_headers) do
-        expect(parse(not_header)).to_not.exist()
+        assert.is_nil(parse(not_header))
       end
     end)
 
@@ -42,7 +39,7 @@ describe('line-level taskpaper parser', function ()
       }
 
       for header, expected in pairs(examples) do
-        expect(parse(header)).to.equal(expected)
+        assert.equal(parse(header), expected)
       end
     end)
 
@@ -56,7 +53,7 @@ describe('line-level taskpaper parser', function ()
 
       for header, expected in pairs(examples) do
         local _, depth = parse(header)
-        expect(depth).to.equal(expected)
+        assert.equal(depth, expected)
       end
     end)
   end)
@@ -115,14 +112,14 @@ describe('line-level taskpaper parser', function ()
     it('returns the note text', function ()
       for task, expected in pairs(examples) do
         local text = parse(task)
-        expect(text).to.be(expected.text)
+        assert.equal(text, expected.text)
       end
     end)
 
     it('returns depth', function ()
       for task, expected in pairs(examples) do
         local _, depth = parse(task)
-        expect(depth).to.be(expected.depth)
+        assert.equal(depth, expected.depth)
       end
     end)
 
@@ -134,13 +131,13 @@ describe('line-level taskpaper parser', function ()
 
         -- Make sure that we parsed all the expected tags.
         for tag, value in pairs(expected_tags) do
-          expect(tags[tag]).to.exist()
-          expect(tags[tag]).to.equal(value)
+          assert.truthy(tags[tag])
+          assert.same(tags[tag], value)
         end
 
         -- Also make sure that we didn't parse any _extra_ tags.
         for tag, _ in pairs(tags) do
-          expect(expected_tags[tag]).to.exist()
+          assert.truthy(expected_tags[tag])
         end
       end
     end)
@@ -153,7 +150,7 @@ describe('line-level taskpaper parser', function ()
       }
 
       for _, not_task in ipairs(not_tasks) do
-        expect(parse(not_task)).to_not.exist()
+        assert.falsy(parse(not_task))
       end
     end)
   end)
@@ -171,7 +168,7 @@ describe('line-level taskpaper parser', function ()
       }
 
       for note, expected in pairs(examples) do
-        expect(parse(note)).to.equal(expected)
+        assert.equal(parse(note), expected)
       end
     end)
 
@@ -185,7 +182,7 @@ describe('line-level taskpaper parser', function ()
 
       for note, expected in pairs(examples) do
         local _, depth = parse(note)
-        expect(depth).to.be(expected)
+        assert.equal(depth, expected)
       end
     end)
   end)

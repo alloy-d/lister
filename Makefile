@@ -1,0 +1,4 @@
+test:
+	busted
+
+.PHONY: test
