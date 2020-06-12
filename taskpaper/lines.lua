@@ -61,9 +61,7 @@ function taskpaper.parse_task (line)
         local name_start, name_end, name = tags_string:find(tag_name_pattern, last_tag_end)
         if not name_start then break end
 
-        -- If a tag is provided without a value, we'll just return its
-        -- value as true.
-        local tag_value = true
+        local tag_values
 
         -- Now let's see if it was provided with a value.
         local values_start, values_end = tags_string:find(value_pattern, name_end + 1)
@@ -78,10 +76,10 @@ function taskpaper.parse_task (line)
 
           if not next_sep_start then
             -- If there's just one value, let's use that directly.
-            tag_value = values_string
+            tag_values = {values_string}
           else
             -- Otherwise, we'll return a list of all the values.
-            tag_value = {}
+            tag_values = {}
 
             -- We're doing a whole lot of gymnastics here to reuse the
             -- results of that first `values_string:find` to check for
@@ -94,7 +92,7 @@ function taskpaper.parse_task (line)
               local end_of_value = (next_sep_start or 0) - 1
               local value = values_string:sub(position, end_of_value)
 
-              table.insert(tag_value, value)
+              table.insert(tag_values, value)
 
               -- Now we'll move to the end of the next separator, or to
               -- the end of the string, then find the next separator
@@ -105,7 +103,12 @@ function taskpaper.parse_task (line)
           end
         end
 
-        tags[name] = tag_value
+        local tag = { name = name }
+        if tag_values then
+          tag.values = tag_values
+        end
+
+        tags[#tags + 1] = tag
         last_tag_end = values_end or name_end
       end
     end

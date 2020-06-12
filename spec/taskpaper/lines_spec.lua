@@ -39,7 +39,7 @@ describe('line-level taskpaper parser', function ()
       }
 
       for header, expected in pairs(examples) do
-        assert.equal(parse(header), expected)
+        assert.equal(expected, parse(header))
       end
     end)
 
@@ -53,7 +53,7 @@ describe('line-level taskpaper parser', function ()
 
       for header, expected in pairs(examples) do
         local _, depth = parse(header)
-        assert.equal(depth, expected)
+        assert.equal(expected, depth)
       end
     end)
   end)
@@ -86,7 +86,7 @@ describe('line-level taskpaper parser', function ()
         depth = 1,
         text = "Try tags",
         tags = {
-          lifehacks = true,
+          { name = "lifehacks" },
         },
       },
 
@@ -94,8 +94,8 @@ describe('line-level taskpaper parser', function ()
         depth = 1,
         text = "Try tags with values",
         tags = {
-          value = "bingo",
-          values = {"whee", "hooray"},
+          { name = "value", values = {"bingo"} },
+          { name = "values", values = {"whee", "hooray"} },
         },
       },
 
@@ -103,8 +103,8 @@ describe('line-level taskpaper parser', function ()
         depth = 1,
         text = "Test tags",
         tags = {
-          with = true,
-          between = true,
+          { name = "with" },
+          { name = "between" },
         }
       },
     }
@@ -112,14 +112,14 @@ describe('line-level taskpaper parser', function ()
     it('returns the note text', function ()
       for task, expected in pairs(examples) do
         local text = parse(task)
-        assert.equal(text, expected.text)
+        assert.equal(expected.text, text)
       end
     end)
 
     it('returns depth', function ()
       for task, expected in pairs(examples) do
         local _, depth = parse(task)
-        assert.equal(depth, expected.depth)
+        assert.equal(expected.depth, depth)
       end
     end)
 
@@ -127,16 +127,16 @@ describe('line-level taskpaper parser', function ()
       for task, expected in pairs(examples) do
         local expected_tags = expected.tags or {}
 
-        local _, _, tags = parse(task)
+        local _, _, parsed_tags = parse(task)
 
         -- Make sure that we parsed all the expected tags.
-        for tag, value in pairs(expected_tags) do
-          assert.truthy(tags[tag])
-          assert.same(tags[tag], value)
+        for i, expected_tag in ipairs(expected_tags) do
+          assert.truthy(parsed_tags[i])
+          assert.same(expected_tag, parsed_tags[i])
         end
 
         -- Also make sure that we didn't parse any _extra_ tags.
-        for tag, _ in pairs(tags) do
+        for tag, _ in pairs(parsed_tags) do
           assert.truthy(expected_tags[tag])
         end
       end
