@@ -12,7 +12,7 @@ local function assert_subtable(base, supertable, path)
   assert.equals("table", type(supertable), "expected table at " .. path)
 
   for key, value in pairs(base) do
-    local path = string.format('%s[%s]', path, key)
+    local path = string.format('%s[%s]', path, key) -- luacheck: ignore
 
     assert.not_equals(nil, supertable[key], "missing value at " .. path)
 
