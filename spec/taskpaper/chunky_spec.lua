@@ -1,4 +1,7 @@
-local taskpaper = require 'taskpaper/chunky'
+local taskpaper = require 'taskpaper.chunky'
+
+local builders = require 'spec.taskpaper.builders'
+local Note, Project, Tag, Task = builders.Note, builders.Project, builders.Tag, builders.Task
 
 -- This does what I would have expected pending() to do already.
 local function pend(name) -- luacheck: ignore
@@ -24,30 +27,6 @@ local function assert_subtable(base, supertable, path)
   end
 end
 
--- Here are some convenience functions to build up the expected data.
-local function Note(...)
-  local lines = table.pack(...)
-  lines.n = nil -- table.pack() sets this, parser doesn't.
-  return {
-    kind = "note",
-    lines = lines,
-  }
-end
-local function Task(text, tags, children)
-  return {
-    kind = "task",
-    text = text,
-    tags = tags,
-    children = children,
-  }
-end
-local function Project(name, children)
-  return {
-    kind = "project",
-    name = name,
-    children = children,
-  }
-end
 
 local example = [[
 This is a chunk of taskpaper.
@@ -77,15 +56,15 @@ local example_parsed = {
   Task("test a top-level task"),
   Project("Project", {
     Note("This is an imaginary project. As part of it, we will do some things in order."),
-    Task("do a thing", {{ name = "first" }}),
-    Task("do another thing", {{ name = "second", values = {'2'} }}, {
+    Task("do a thing", {Tag("first")}),
+    Task("do another thing", {Tag("second", "2")}, {
       Note(
         "This thing should happen after that last one,",
         "and it should have this note attached."
       )
     }),
     Note("This next thing is not special, but it comes after this note."),
-    Task("do a final thing", {{name = "things-done", values = {"first", "second", "final"}}}),
+    Task("do a final thing", {Tag("things-done", "first", "second", "final")}),
     Project("Subproject", {
       Note("This project is a part of that other project."),
       Task("do more things"),
