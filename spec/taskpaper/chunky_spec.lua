@@ -77,15 +77,15 @@ local example_parsed = {
   Task("test a top-level task"),
   Project("Project", {
     Note("This is an imaginary project. As part of it, we will do some things in order."),
-    Task("do a thing", { first = true }),
-    Task("do another thing", { second = '2' }, {
+    Task("do a thing", {{ name = "first" }}),
+    Task("do another thing", {{ name = "second", values = {'2'} }}, {
       Note(
         "This thing should happen after that last one,",
         "and it should have this note attached."
       )
     }),
     Note("This next thing is not special, but it comes after this note."),
-    Task("do a final thing", {["things-done"] = {"first", "second", "final"}}),
+    Task("do a final thing", {{name = "things-done", values = {"first", "second", "final"}}}),
     Project("Subproject", {
       Note("This project is a part of that other project."),
       Task("do more things"),
