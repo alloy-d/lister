@@ -41,11 +41,12 @@ local function format_single_file (file, in_place)
     f:write(taskpaper.format(tree))
     f:close()
   else
-    print(taskpaper.format(tree))
+    print(tree.path .. ":\n")
+    print(taskpaper.format(tree, 1))
+    print("\n")
   end
 end
 local function format (files, in_place)
-  print(string.format("formatting files: %s", table.concat(files, ", ")))
   for i = 1, #files do
     format_single_file(files[i], in_place)
   end
