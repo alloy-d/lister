@@ -34,5 +34,11 @@ function builders.Project(name, children)
     children = children,
   }
 end
+function builders.Root(children)
+  return {
+    kind = "root",
+    children = children,
+  }
+end
 
 return builders

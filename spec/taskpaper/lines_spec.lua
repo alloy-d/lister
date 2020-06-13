@@ -105,7 +105,16 @@ describe('line-level taskpaper parser', function ()
         tags = {
           { name = "with" },
           { name = "between" },
-        }
+        },
+      },
+
+      ["- Test short numeric tags @number(1) @numbers(2, 3)"] = {
+        depth = 1,
+        text = "Test short numeric tags",
+        tags = {
+          { name = "number", values = {"1"} },
+          { name = "numbers", values = {"2", "3"} },
+        },
       },
     }
 

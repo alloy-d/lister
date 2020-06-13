@@ -1,7 +1,7 @@
 local printer = require 'taskpaper.printer'
 
 local builders = require 'spec.taskpaper.builders'
-local Note, Project, Tag, Task = builders.Note, builders.Project, builders.Tag, builders.Task
+local Note, Project, Root, Tag, Task = builders.Note, builders.Project, builders.Root, builders.Tag, builders.Task
 
 local function exemplifier(formatter)
   return function (data)
@@ -13,12 +13,6 @@ local function exemplifier(formatter)
 end
 
 describe('taskpaper printer', function ()
-  it('formats headers', function ()
-    local project = Project("Testing the printer")
-    local expected = "Testing the printer:"
-    assert.equals(expected, printer.format_header(project))
-  end)
-
   describe('for notes', function ()
     local example = exemplifier(printer.format_note)
 
@@ -100,21 +94,18 @@ describe('taskpaper printer', function ()
     }
   end)
 
-  describe('for general trees', function ()
-    local example = exemplifier(printer.format)
+  local sample_project = Project("Test printer", {
+    Note("This should already be indented with depth 1."),
+    Task("let's due this!", {Tag("due", "2020-06-12")}),
 
-    local sample_project = Project("Test printer", {
-      Note("This should already be indented with depth 1."),
-      Task("let's due this!", {Tag("due", "2020-06-12")}),
-
-      Project("Test printing subprojects", {
-        Task("make sure this has more depth", nil, {
-          Note("This task has a note."),
-        }),
-        Note("This is a project-level note."),
+    Project("Test printing subprojects", {
+      Task("make sure this has more depth", nil, {
+        Note("This task has a note."),
       }),
-    })
-    local sample_project_printed = [[
+      Note("This is a project-level note."),
+    }),
+  })
+  local sample_project_printed = [[
 Test printer:
   This should already be indented with depth 1.
   - let's due this! @due(2020-06-12)
@@ -124,6 +115,19 @@ Test printer:
       This task has a note.
 
     This is a project-level note.]]
+
+  describe('for projects', function ()
+    local example = exemplifier(printer.format_project)
+
+    example{
+      desc = "a project",
+      input = sample_project,
+      output = sample_project_printed,
+    }
+  end)
+
+  describe('for general trees', function ()
+    local example = exemplifier(printer.format)
 
     local sample_task = Task("do a standalone task")
     local sample_task_printed = "- do a standalone task"
@@ -150,20 +154,14 @@ at the top level of your taskpaper tree.]]
     }, "\n")
 
     example{
-      desc = "a project",
-      input = {sample_project},
-      output = sample_project_printed,
-    }
-
-    example{
       desc = "a root",
-      input = sample_root,
+      input = Root(sample_root),
       output = sample_root_printed,
     }
 
     example{
       desc = "a root at depth",
-      input = sample_root,
+      input = Root(sample_root),
       depth = 2,
       output = "    " .. sample_root_printed:gsub("\n%f[^\n]", "\n    "),
     }
