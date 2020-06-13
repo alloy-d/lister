@@ -1,3 +1,4 @@
+#!/usr/bin/env lua
 local argparse = require 'argparse'
 
 local taskpaper = require 'taskpaper'
