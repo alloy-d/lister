@@ -2,11 +2,9 @@ local builders = {}
 
 -- Here are some convenience functions to build up the expected data.
 function builders.Note(...)
-  local lines = table.pack(...)
-  lines.n = nil -- table.pack() sets this, parser doesn't.
   return {
     kind = "note",
-    lines = lines,
+    lines = {...},
   }
 end
 function builders.Task(text, tags, children)
@@ -21,8 +19,7 @@ function builders.Tag(name, ...)
   local result = { name = name }
 
   if select('#', ...) > 0 then
-    result.values = table.pack(...)
-    result.values.n = nil
+    result.values = {...}
   end
 
   return result
