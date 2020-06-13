@@ -1,4 +1,4 @@
-local tplines = require 'taskpaper/lines'
+local tplines = require 'taskpaper.lines'
 
 local chunky = {}
 

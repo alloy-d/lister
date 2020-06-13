@@ -1,4 +1,4 @@
-local taskpaper = require 'taskpaper/lines'
+local taskpaper = require 'taskpaper.lines'
 
 -- These let you do something like `map(enquote, list_of_strings)` to
 -- make string comparisons more clear when they involve leading or
