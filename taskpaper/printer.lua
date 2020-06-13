@@ -5,7 +5,12 @@ end
 local format -- top-level formatting function; declared here for use in helpers
 
 local function format_header(header, depth)
-  return string.format("%s%s:", indent(depth), header.name)
+  return string.format("%s%s:", indent(depth), header)
+end
+
+local function format_project(project, depth)
+  depth = depth or 0
+  return format_header(project.name, depth) .. "\n" .. format(project, depth + 1)
 end
 
 local function format_note(note, depth)
@@ -39,7 +44,7 @@ local function format_task(task, depth)
   end
 
   if task.children then
-    result = result .. "\n" .. format(task.children, depth + 1)
+    result = result .. "\n" .. format(task, depth + 1)
   end
 
   return result
@@ -50,17 +55,17 @@ format = function (tree, depth)
   depth = depth or 0
   local formatted = {}
 
-  for i = 1, #tree do
-    local item = tree[i]
+  for i = 1, #tree.children do
+    local item = tree.children[i]
 
-    -- Add a blank line before project headers or notes.
+    -- Add a blank line between project headers or notes if anything
+    -- precedes them.
     if i ~= 1 and (item.kind == "project" or item.kind == "note") then
       table.insert(formatted, "")
     end
 
     if item.kind == "project" then
-      table.insert(formatted, format_header(item, depth))
-      table.insert(formatted, format(item.children, depth + 1))
+      table.insert(formatted, format_project(item, depth))
     elseif item.kind == "task" then
       table.insert(formatted, format_task(item, depth))
     elseif item.kind == "note" then
@@ -72,8 +77,8 @@ format = function (tree, depth)
 end
 
 return {
-  format_header = format_header,
   format_task = format_task,
   format_note = format_note,
+  format_project = format_project,
   format = format,
 }

@@ -97,9 +97,9 @@ function taskpaper.parse_task (line)
               -- Now we'll move to the end of the next separator, or to
               -- the end of the string, then find the next separator
               -- after our new position.
-              position = next_sep_end and next_sep_end + 1 or #values_string
+              position = next_sep_end and (next_sep_end + 1) or (#values_string + 1)
               next_sep_start, next_sep_end = values_string:find(separator_pattern, position)
-            until position == #values_string
+            until position == #values_string + 1
           end
         end
 
