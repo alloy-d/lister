@@ -49,7 +49,7 @@ files into a holistic GTD system.
 It provides some unixy tooling for working with lists.  For instance, if
 I just want to see what's in some of my lists:
 
-```sh
+```
 $ lister list-files | grep -v '/home/awl/todo.taskpaper' | xargs lister format
 /home/awl/code/lister/project.taskpaper:
 
