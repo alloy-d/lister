@@ -1,5 +1,7 @@
 # Lister
 
+[![Build Status](https://travis-ci.com/alloy-d/lister.svg?branch=master)](https://travis-ci.com/alloy-d/lister)
+
 Lister is a tool for managing your lists.
 "Lists" here is used in the sense of _Getting Things Done_.
 
