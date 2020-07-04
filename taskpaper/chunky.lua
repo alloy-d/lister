@@ -1,4 +1,7 @@
 local tplines = require 'taskpaper.lines'
+local tpmeta = require 'taskpaper.tables'
+
+local bless = tpmeta.bless
 
 local chunky = {}
 
@@ -7,7 +10,7 @@ local function Project (header, depth)
     return nil
   end
 
-  return {
+  return bless{
     kind = "project",
     name = header,
     parent = nil,
@@ -20,7 +23,7 @@ local function Task (text, depth, tags)
     return nil
   end
 
-  return {
+  return bless{
     kind = "task",
     text = text,
     tags = tags,
@@ -35,7 +38,7 @@ local function Note (text, depth)
     return nil
   end
 
-  return {
+  return bless{
     kind = "note",
     lines = { text },
     parent = nil,
@@ -57,7 +60,7 @@ local function print_thing(thing, label) -- luacheck: ignore
 end
 
 function chunky.parse (chunk)
-  local root = {
+  local root = bless{
     kind = "root",
     parent = nil,
     _depth = 1,
