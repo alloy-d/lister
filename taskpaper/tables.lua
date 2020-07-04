@@ -29,23 +29,49 @@ local function populate_paths(thing)
   end
 end
 
+-- Turn a serialized path (separated by ':') into a table.
+local function parse_path(path_string)
+  local path = {}
+  for part in path_string:gmatch('[^:]+') do
+    path[#path + 1] = tonumber(part) or part
+  end
+  return path
+end
+
+-- Returns the thing at the given path.
+-- If `path` is a string, first parses it via `parse_path`.
+local function lookup(thing, path)
+  if type(path) == 'string' then
+    path = parse_path(path)
+  end
+
+  if #path == 0 then -- we're looking at the thing we wanted to find
+    return thing
+  end
+
+  return lookup(thing.children[path[1]], table.move(path, 2, #path, 1, {}))
+end
+
 local metatables = {
   root = {
     kind = "root",
     totaskpaper = printer.format,
     populate_paths = populate_paths,
+    lookup = lookup,
     __index = index,
   },
   project = {
     kind = "project",
     totaskpaper = printer.format_project,
     populate_paths = populate_paths,
+    lookup = lookup,
     __index = index,
   },
   task = {
     kind = "task",
     totaskpaper = printer.format_task,
     populate_paths = populate_paths,
+    lookup = lookup,
     __index = index,
   },
   note = {
