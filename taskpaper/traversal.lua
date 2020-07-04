@@ -48,7 +48,7 @@ local function crawler(thing)
     coroutine.yield(thing)
     if thing.children then
       for _, child in ipairs(thing.children) do
-        coroutine.yield(child)
+        crawler(child)()
       end
     end
   end
@@ -58,7 +58,7 @@ function M.crawl(thing)
   local co = coroutine.create(crawler(thing))
 
   return function ()
-    local code, res = coroutine.resume(co)
+    local _, res = coroutine.resume(co)
     return res
   end
 end
