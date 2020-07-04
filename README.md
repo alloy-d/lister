@@ -57,9 +57,11 @@ $ lister list-files | grep -v '/home/awl/todo.taskpaper' | xargs lister format
 
   Functionality:
     - write a taskpaper formatter @done(2020-06-12)
-    - write a command to list projects
+    - write a command to list projects @done(2020-07-04)
     - write a query function
-    - figure out how to ignore files
+
+    Unixy CLI:
+      - figure out how to ignore files
     - add a curses interface for browsing
 
   Bookkeeping:
@@ -70,9 +72,8 @@ $ lister list-files | grep -v '/home/awl/todo.taskpaper' | xargs lister format
       "listicle"?
       "blister"?
     - change name to `lister` @done(2020-06-08)
-    - write a README
-    - push to GitHub
-
+    - write a README @done(2020-07-04)
+    - push to GitHub @done(2020-07-04)
 
 /home/awl/code/photobox/todo.taskpaper:
 
@@ -85,14 +86,47 @@ $ lister list-files | grep -v '/home/awl/todo.taskpaper' | xargs lister format
   - audit for places to use `status --is-login` and `status --is-interactive`
 ```
 
+Or maybe I want to see a list of projects:
+
+```
+$ lister list-projects -d ~/code/lister
+Functionality
+Unixy CLI
+Bookkeeping
+```
+
+I can also get those with their "paths", which Lister can use to
+reference them later:
+
+```
+$ lister list-projects -p -d ~/code/lister
+/home/awl/code/lister/project.taskpaper:1	      Functionality
+/home/awl/code/lister/project.taskpaper:1:4	    Unixy CLI
+/home/awl/code/lister/project.taskpaper:2	      Bookkeeping
+```
+
+This isn't illuminating on its own, but you could combine it with
+[`fzf`][fzf] to search for and show a project:
+
+```
+$ lister list-projects -p -d ~/code/lister | fzf --with-nth=2 -d'\t' | cut -f1 | xargs lister show
+... (search for and select "Unixy CLI")
+
+Unixy CLI:
+  - figure out how to ignore files
+```
+
 And... well, that's it.  That's all it does so far.  Cool, right?!
 
 ### Future plans
 
-That example up there includes what I'm planning to do with this.
+Some major missing chunks:
 
-First up is extending the CLI with various ways to filter information,
-so it becomes more than a slower `find` and `cat`.
+- The idea of an inbox.  You could have something like
+  `INBOX.taskpaper`, but without facilities for moving tasks from there
+  to existing files or projects, there's friction in processing it.
+- The idea of an archive.  It would be nice to be able to reap `@done`
+  tasks and put them somewhere else.
 
 I also have grand dreams of adding a curses interface.
 
@@ -124,3 +158,4 @@ pull request about it!
 [taskpaper]: https://guide.taskpaper.com/
 [taskpaper.vim]: https://github.com/davidoc/taskpaper.vim
 [things]: https://culturedcode.com/things/
+[fzf]: https://github.com/junegunn/fzf
