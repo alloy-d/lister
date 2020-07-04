@@ -50,3 +50,36 @@ describe('paths', function ()
     end)
   end)
 end)
+
+describe('crawling', function ()
+  it('returns a sequence of things in depth-first order', function ()
+    local chunk = taskpaper.parse(examples.chunk)
+    local expectations = {
+      {kind = "root"},
+      Note(),
+      Task({text = "test a top-level task"}),
+      Project({name = "Project"}),
+      Note(),
+      Task({text = "do a thing"}),
+      Task({text = "do another thing"}),
+      Note(),
+      Note({lines = {"This next thing is not special, but it comes after this note."}}),
+      Task({text = "do a final thing"}),
+      Project({name = "Subproject"}),
+      Note({lines = {"This project is a part of that other project."}}),
+      Task({text = "do more things"}),
+      Note({lines = {"This is a final note in the first project."}}),
+      Note({lines = {"And with this note, we have completed our example!"}}),
+    }
+
+    local i = 0
+    for thing in chunk:crawl() do
+      i = i + 1
+      if expectations[i] then
+        assert_subtable(expectations[i], thing)
+      end
+    end
+
+    assert.is_true(i >= #expectations, 'iterator returned at least as many things as expected')
+  end)
+end)

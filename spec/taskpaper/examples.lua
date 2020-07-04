@@ -21,6 +21,10 @@ Project:
   Subproject:
     This project is a part of that other project.
     - do more things
+
+  This is a final note in the first project.
+
+And with this note, we have completed our example!
 ]]
 
 examples.chunk_parsed = {
@@ -44,7 +48,9 @@ examples.chunk_parsed = {
       Note("This project is a part of that other project."),
       Task("do more things"),
     }),
+    Note("This is a final note in the first project."),
   }),
+  Note("And with this note, we have completed our example!"),
 }
 
 return examples
