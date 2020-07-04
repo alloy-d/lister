@@ -14,21 +14,34 @@ parser:command_target("command")
 parser:command("list-files lsf", [[
 List the files that would be searched for projects and tasks.
 
-Uses $HOME by default, but can be changed with --dir.]])
+Uses $HOME by default, but can be changed with --dir.
 
-local lsp_cmd = parser:command("list-projects lsp", "List all projects.")
+]])
+
+local lsp_cmd = parser:command("list-projects lsp", [[
+List all projects.
+
+]])
 lsp_cmd:option("-p --show-paths", "Output paths in addition to project names."):args(0)
 
 local show_cmd = parser:command("show", [[
 Show something (or some things).
 
-"Something" can be a file, or an item within a file, specified by its path.]])
+"Something" can be a file, or an item within a file, specified by its path.
+
+For example:
+  `show ~/todo.taskpaper:2` will show the second thing in ~/todo.taskpaper,
+  `show ~/todo.taskpaper:2:1` will show the first thing within that thing, &c.
+
+]])
 show_cmd:argument("path", "The path to the thing(s) to show."):args("+")
 
 local fmt_cmd = parser:command("format fmt", [[
 Print the given file(s) with automatic formatting.
 
-Writes to standard out by default, but can format the file in-place with -i.]])
+Writes to standard out by default, but can format the file in-place with -i.
+
+]])
 fmt_cmd:argument("file", "The taskpaper file to format."):args("+")
 fmt_cmd:option("-i --in-place", "Rewrite the file instead of printing to stdout."):args(0)
 
