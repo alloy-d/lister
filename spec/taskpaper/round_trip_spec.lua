@@ -10,8 +10,24 @@ describe("round trip", function ()
     assert:remove_formatter(binstring)
   end)
 
-  it("parses and reformats well-formed taskpaper to the same string", function ()
-    local example = [[
+  describe("of tasks", function ()
+    it("parses and reformats a task to the same string", function ()
+      local examples = {
+        "- do a thing",
+        "- do a thing with a @tag",
+        "- do a thing with @two @tags",
+        "- do a thing with @valued(1, 2) @tags",
+      }
+
+      for _, task in ipairs(examples) do
+        assert.same(task, taskpaper.parse(task):totaskpaper())
+      end
+    end)
+  end)
+
+  describe("of full taskpaper blob", function ()
+    it("parses and reformats well-formed taskpaper to the same string", function ()
+      local example = [[
 - do this top-level task
 
 A project:
@@ -26,6 +42,7 @@ A project:
 
 Let's hope this works out OK!]]
 
-    assert.same(example, taskpaper.format(taskpaper.parse(example)))
+      assert.same(example, taskpaper.parse(example):totaskpaper())
+    end)
   end)
 end)
