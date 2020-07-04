@@ -5,6 +5,16 @@ local helpers = require 'spec.taskpaper.helpers'
 
 local assert_subtable = helpers.assert_subtable
 
+local function builder (kind)
+  return function (additions)
+    additions = additions or {}
+    additions.kind = kind
+    return additions
+  end
+end
+
+local Note, Task, Project = builder('note'), builder('task'), builder('project')
+
 describe('paths', function ()
   describe('generated', function ()
     it('match what we expect', function ()
@@ -33,10 +43,10 @@ describe('paths', function ()
         assert_subtable(expectation, chunk:lookup(path))
       end
 
-      check(":1",     {kind = "note"})
-      check(":3",     {kind = "project", name = "Project"})
-      check(":3:3:1", {kind = "note"})
-      check(":3:6:2", {kind = "task", text = "do more things"})
+      check(":1",     Note())
+      check(":3",     Project({name = "Project"}))
+      check(":3:3:1", Note())
+      check(":3:6:2", Task({text = "do more things"}))
     end)
   end)
 end)
