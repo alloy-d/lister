@@ -1,7 +1,7 @@
 local M = {}
 
 -- Turn a serialized path (separated by ':') into a table.
-local function parse_path(path_string)
+function M.parse_path(path_string)
   local path = {}
   for part in path_string:gmatch('[^:]+') do
     path[#path + 1] = tonumber(part) or part
@@ -33,7 +33,7 @@ end
 -- If `path` is a string, first parses it via `parse_path`.
 function M.lookup(thing, path)
   if type(path) == 'string' then
-    path = parse_path(path)
+    path = M.parse_path(path)
   end
 
   if #path == 0 then -- we're looking at the thing we wanted to find

@@ -2,6 +2,7 @@
 local argparse = require 'argparse'
 
 local taskpaper = require 'taskpaper'
+local parse_path = require('taskpaper.traversal').parse_path
 
 local parser = argparse()
     :name("lister")
@@ -15,17 +16,31 @@ List the files that would be searched for projects and tasks.
 
 Uses $HOME by default, but can be changed with --dir.]])
 
-local lsp = parser:command("list-projects lsp", "List all projects.")
-lsp:option("-p --show-paths", "Output paths in addition to project names."):args(0)
+local lsp_cmd = parser:command("list-projects lsp", "List all projects.")
+lsp_cmd:option("-p --show-paths", "Output paths in addition to project names."):args(0)
 
-local fmt = parser:command("format fmt", [[
+local show_cmd = parser:command("show", [[
+Show something (or some things).
+
+"Something" can be a file, or an item within a file, specified by its path.]])
+show_cmd:argument("path", "The path to the thing(s) to show."):args("+")
+
+local fmt_cmd = parser:command("format fmt", [[
 Print the given file(s) with automatic formatting.
 
 Writes to standard out by default, but can format the file in-place with -i.]])
-fmt:argument("file", "The taskpaper file to format."):args("+")
-fmt:option("-i --in-place", "Rewrite the file instead of printing to stdout."):args(0)
+fmt_cmd:argument("file", "The taskpaper file to format."):args("+")
+fmt_cmd:option("-i --in-place", "Rewrite the file instead of printing to stdout."):args(0)
 
 local args = parser:parse()
+
+local function map (xs, f)
+  local result = {}
+  for i, x in ipairs(xs) do
+    result[i] = f(x)
+  end
+  return result
+end
 
 local function find_files (dir)
   local files = {}
@@ -54,6 +69,24 @@ local function list_projects (dir, show_paths)
   end
 end
 
+local function show (paths)
+  paths = map(paths, parse_path)
+  local file_cache = {}
+
+  local function load (filename)
+    if not file_cache[filename] then
+      file_cache[filename] = taskpaper.load_file(filename)
+    end
+    return file_cache[filename]
+  end
+
+  for _, path in ipairs(paths) do
+    local file = load(path[1])
+    local path_in_file = table.move(path, 2, #path, 1, {})
+    print(file:lookup(path_in_file):totaskpaper())
+  end
+end
+
 local function format_single_file (file, in_place)
   local tree = taskpaper.load_file(file)
   if in_place then
@@ -79,6 +112,8 @@ if args.command == "list-files" then
   end
 elseif args.command == "list-projects" then
   list_projects(args.dir, args.show_paths)
+elseif args.command == "show" then
+  show(args.path)
 elseif args.command == "format" then
   format(args.file, args.in_place)
 end
