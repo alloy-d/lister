@@ -15,6 +15,9 @@ List the files that would be searched for projects and tasks.
 
 Uses $HOME by default, but can be changed with --dir.]])
 
+local lsp = parser:command("list-projects lsp", "List all projects.")
+lsp:option("-p --show-paths", "Output paths in addition to project names."):args(0)
+
 local fmt = parser:command("format fmt", [[
 Print the given file(s) with automatic formatting.
 
@@ -32,6 +35,23 @@ local function find_files (dir)
   end
   cmd:close()
   return files
+end
+
+local function list_projects (dir, show_paths)
+  local files = find_files(dir)
+  local roots = map(files, taskpaper.load_file)
+
+  for _, root in ipairs(roots) do
+    for item in root:crawl() do
+      if item.kind == "project" then
+        if show_paths then
+          print(item.path, item.name)
+        else
+          print(item.name)
+        end
+      end
+    end
+  end
 end
 
 local function format_single_file (file, in_place)
@@ -57,6 +77,8 @@ if args.command == "list-files" then
   for i = 1, #files do
     print(files[i])
   end
+elseif args.command == "list-projects" then
+  list_projects(args.dir, args.show_paths)
 elseif args.command == "format" then
   format(args.file, args.in_place)
 end
