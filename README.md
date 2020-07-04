@@ -100,9 +100,9 @@ reference them later:
 
 ```
 $ lister list-projects -p -d ~/code/lister
-/home/awl/code/lister/project.taskpaper:1	      Functionality
-/home/awl/code/lister/project.taskpaper:1:4	    Unixy CLI
-/home/awl/code/lister/project.taskpaper:2	      Bookkeeping
+/home/awl/code/lister/project.taskpaper:1	Functionality
+/home/awl/code/lister/project.taskpaper:1:4	Unixy CLI
+/home/awl/code/lister/project.taskpaper:2	Bookkeeping
 ```
 
 This isn't illuminating on its own, but you could combine it with
