@@ -28,6 +28,7 @@ build = {
     ["taskpaper.chunky"] = "taskpaper/chunky.lua",
     ["taskpaper.filer"] = "taskpaper/filer.lua",
     ["taskpaper.lines"] = "taskpaper/lines.lua",
+    ["taskpaper.mutation"] = "taskpaper/mutation.lua",
     ["taskpaper.printer"] = "taskpaper/printer.lua",
     ["taskpaper.tables"] = "taskpaper/tables.lua",
     ["taskpaper.traversal"] = "taskpaper/traversal.lua",
