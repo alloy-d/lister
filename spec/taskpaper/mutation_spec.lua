@@ -83,11 +83,12 @@ describe('mutation', function ()
   end)
 
   describe('by moving', function ()
-    local chunk, task, task_initial_path, task_destination_path
+    local chunk, task, task_initial_path, task_destination_path, task_expected_final_path
     before_each(function ()
       chunk = taskpaper.parse(examples.chunk)
       task_initial_path = ":3:3"
       task_destination_path = ":3:6"
+      task_expected_final_path = ":3:5:3"
       task = chunk:lookup(task_initial_path)
     end)
     after_each(function ()
@@ -95,6 +96,7 @@ describe('mutation', function ()
       task = nil
       task_initial_path = nil
       task_destination_path = nil
+      task_expected_final_path = nil
     end)
 
     it('moves a thing to a different place', function ()
@@ -114,17 +116,18 @@ describe('mutation', function ()
     end)
 
     it('invalidates cached paths in the moved tree', function ()
-      chunk.path = '' -- set root path to empty string to make comparisons easy
       local task_child_initial_path = task_initial_path .. ':1'
 
       -- Make sure the paths are set initially.
-      assert.same(task_child_initial_path, task.children[1].path)
-      assert.same(task_initial_path, task.path)
+      assert.equal(task_child_initial_path, task.children[1].path)
+      assert.equal(task_initial_path, task.path)
 
       mutation.move(chunk, task_initial_path, chunk, task_destination_path)
 
-      assert.not_same(task_initial_path, task.path)
-      assert.not_same(task_child_initial_path, task.children[1].path)
+      assert.not_equal(task_initial_path, task.path)
+      assert.not_equal(task_child_initial_path, task.children[1].path)
+
+      assert.equal(task_expected_final_path, task.path)
     end)
   end)
 

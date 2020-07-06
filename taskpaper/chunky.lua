@@ -62,6 +62,7 @@ end
 function chunky.parse (chunk)
   local root = bless{
     kind = "root",
+    path = "",
     parent = nil,
     _depth = 1,
   }
