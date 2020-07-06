@@ -1,3 +1,4 @@
+local mutation = require 'taskpaper.mutation'
 local printer = require 'taskpaper.printer'
 local traversal = require 'taskpaper.traversal'
 
@@ -20,6 +21,8 @@ local metatables = {
     populate_paths = traversal.populate_paths,
     lookup = traversal.lookup,
     crawl = traversal.crawl,
+    append = mutation.append,
+    remove = mutation.remove,
     __index = index,
   },
   project = {

@@ -40,7 +40,7 @@ describe('paths', function ()
       local chunk = taskpaper.parse(examples.chunk)
 
       local function check(path, expectation)
-        assert_subtable(expectation, chunk:lookup(path))
+        assert_subtable(expectation, (chunk:lookup(path)))
       end
 
       check(":1",     Note())
