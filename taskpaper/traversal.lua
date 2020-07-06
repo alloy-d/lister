@@ -29,6 +29,18 @@ function M.populate_paths(thing)
   end
 end
 
+-- Unpopulate a thing's path.  If it has children, also unpopulate their
+-- paths.
+function M.unpopulate_paths(thing)
+  thing.path = nil
+
+  if thing.children then
+    for _, child in ipairs(thing.children) do
+      M.unpopulate_paths(child)
+    end
+  end
+end
+
 -- Returns the thing at the given path.
 -- If `path` is a string, first parses it via `parse_path`.
 --

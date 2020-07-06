@@ -1,4 +1,5 @@
 local taskpaper = require 'taskpaper'
+local mutation = require 'taskpaper.mutation'
 
 local tpmeta = require 'taskpaper.tables'
 local bless = tpmeta.bless
@@ -78,6 +79,52 @@ describe('mutation', function ()
       for i = 1, #project.children do
         assert.not_equal(nil, project.children[i], "no child is nil")
       end
+    end)
+  end)
+
+  describe('by moving', function ()
+    local chunk, task, task_initial_path, task_destination_path
+    before_each(function ()
+      chunk = taskpaper.parse(examples.chunk)
+      task_initial_path = ":3:3"
+      task_destination_path = ":3:6"
+      task = chunk:lookup(task_initial_path)
+    end)
+    after_each(function ()
+      chunk = nil
+      task = nil
+      task_initial_path = nil
+      task_destination_path = nil
+    end)
+
+    it('moves a thing to a different place', function ()
+      local initial_parent, path_in_initial_parent = chunk:lookup(task_initial_path, 1)
+      local destination_parent = chunk:lookup(task_destination_path)
+
+      assert.same(initial_parent, task.parent)
+
+      mutation.move(chunk, task_initial_path, chunk, task_destination_path)
+
+      assert.not_same(initial_parent:lookup(path_in_initial_parent), task,
+          "task is no longer in initial parent")
+      assert.same(destination_parent.children[#destination_parent.children], task,
+          "task is in new parent")
+      assert.same(destination_parent, task.parent,
+          "task's parent is its new project")
+    end)
+
+    it('invalidates cached paths in the moved tree', function ()
+      chunk.path = '' -- set root path to empty string to make comparisons easy
+      local task_child_initial_path = task_initial_path .. ':1'
+
+      -- Make sure the paths are set initially.
+      assert.same(task_child_initial_path, task.children[1].path)
+      assert.same(task_initial_path, task.path)
+
+      mutation.move(chunk, task_initial_path, chunk, task_destination_path)
+
+      assert.not_same(task_initial_path, task.path)
+      assert.not_same(task_child_initial_path, task.children[1].path)
     end)
   end)
 
