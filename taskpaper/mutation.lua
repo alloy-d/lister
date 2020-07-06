@@ -25,8 +25,13 @@ function M.remove(root, path)
 
   local child = table.remove(parent.children, path_in_parent[1])
 
+  -- Reset positional data on the now-orphaned family tree.
   child.parent = nil
   traversal.unpopulate_paths(child)
+
+  -- Also reset positional data on the parent's children, which may have
+  -- changed position after their sibling's removal.
+  traversal.populate_paths(parent)
 
   return child
 end
