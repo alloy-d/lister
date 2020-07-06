@@ -31,16 +31,28 @@ end
 
 -- Returns the thing at the given path.
 -- If `path` is a string, first parses it via `parse_path`.
-function M.lookup(thing, path)
+--
+-- If `leave_untraversed_count` is given, returns the thing that many
+-- steps from the end of the path, along with the untraversed portion of
+-- `path`.
+--
+-- For example, providing `leave_untraversed_count=1` will return the
+-- parent of the thing at `path`, plus the index of the thing in that
+-- parent's children.
+function M.lookup(thing, path, leave_untraversed_count)
+  leave_untraversed_count = leave_untraversed_count or 0
+
   if type(path) == 'string' then
     path = M.parse_path(path)
   end
 
-  if #path == 0 then -- we're looking at the thing we wanted to find
-    return thing
+  if #path == leave_untraversed_count then -- we're looking at the thing we wanted to find
+    return thing, path
+  elseif #path < leave_untraversed_count then
+    error(string.format("path is not long enough to leave %d steps untraversed", leave_untraversed_count))
   end
 
-  return M.lookup(thing.children[path[1]], table.move(path, 2, #path, 1, {}))
+  return M.lookup(thing.children[path[1]], table.move(path, 2, #path, 1, {}), leave_untraversed_count)
 end
 
 local function crawler(thing)
