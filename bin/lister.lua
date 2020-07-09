@@ -57,7 +57,21 @@ end
 
 local function find_files (dir)
   local files = {}
-  local cmd = io.popen(string.format("find '%s' -name '*.taskpaper'", dir))
+  local cmd
+
+  if os.execute("which fd > /dev/null") then
+    local ignore_arg = ""
+    local ignore_file = io.open(os.getenv("HOME") .. "/.lister-ignore")
+    if ignore_file then
+      ignore_file:close()
+      ignore_arg = "--ignore-file ~/.lister-ignore"
+    end
+
+    cmd = io.popen(string.format("fd -e taskpaper --no-ignore %s --hidden . '%s'", ignore_arg, dir))
+  else
+    cmd = io.popen(string.format("find '%s' -name '*.taskpaper'", dir))
+  end
+
   for line in cmd:lines() do
     files[#files + 1] = line
   end
