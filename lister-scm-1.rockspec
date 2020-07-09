@@ -20,6 +20,7 @@ dependencies = {
 }
 build_dependencies = {
   "busted",
+  "luacheck",
 }
 build = {
   type = "builtin",
