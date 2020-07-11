@@ -1,4 +1,5 @@
 local chunky = require 'taskpaper.chunky'
+local bless = require 'taskpaper.bless'
 
 local M = {}
 
@@ -11,7 +12,15 @@ function M.load_file (filename)
   parsed.kind = "file"
   parsed.path = filename
 
-  return parsed
+  return bless(parsed)
+end
+
+function M.write (self)
+  local f = assert(io.open(self.path, 'w'))
+
+  f:write(self:totaskpaper())
+
+  f:close()
 end
 
 return M

@@ -3,19 +3,15 @@ local printer = require 'taskpaper.printer'
 local builders = require 'spec.taskpaper.builders'
 local Note, Project, Root, Tag, Task = builders.Note, builders.Project, builders.Root, builders.Tag, builders.Task
 
-local function exemplifier(formatter)
-  return function (data)
-    it('formats ' .. data.desc, function ()
-      local formatted = formatter(data.input, data.depth)
-      assert.same(data.output, formatted)
-    end)
-  end
+local function example (data)
+  it('formats ' .. data.desc, function ()
+    local formatted = printer.format(data.input, data.depth)
+    assert.same(data.output, formatted)
+  end)
 end
 
 describe('taskpaper printer', function ()
   describe('for notes', function ()
-    local example = exemplifier(printer.format_note)
-
     example{
       desc = 'single-line notes',
       input = Note("just a single line"),
@@ -61,8 +57,6 @@ describe('taskpaper printer', function ()
   end)
 
   describe('for tasks', function ()
-    local example = exemplifier(printer.format_task)
-
     example{
       desc = "a simple task",
       input = Task(
@@ -117,8 +111,6 @@ Test printer:
     This is a project-level note.]]
 
   describe('for projects', function ()
-    local example = exemplifier(printer.format_project)
-
     example{
       desc = "a project",
       input = sample_project,
@@ -127,8 +119,6 @@ Test printer:
   end)
 
   describe('for general trees', function ()
-    local example = exemplifier(printer.format)
-
     local sample_task = Task("do a standalone task")
     local sample_task_printed = "- do a standalone task"
 
