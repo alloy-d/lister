@@ -7,18 +7,19 @@ local function indent(depth)
   return depth and string.rep(indent_string, depth) or ""
 end
 
+local formatters = {}
 local format -- top-level formatting function; declared here for use in helpers
 
 local function format_header(header, depth)
   return string.format("%s%s:", indent(depth), header)
 end
 
-local function format_project(project, depth)
+function formatters.project(project, depth)
   depth = depth or 0
-  return format_header(project.name, depth) .. "\n" .. format(project, depth + 1)
+  return format_header(project.name, depth) .. "\n" .. formatters.root(project, depth + 1)
 end
 
-local function format_note(note, depth)
+function formatters.note(note, depth)
   local lines
   if not depth or depth == 0 then
     lines = note.lines
@@ -40,7 +41,7 @@ local function format_tag(tag)
   return formatted
 end
 
-local function format_task(task, depth)
+function formatters.task(task, depth)
   local result = string.format("%s- %s", indent(depth), task.text)
   if task.tags then
     for _, tag in ipairs(task.tags) do
@@ -49,41 +50,47 @@ local function format_task(task, depth)
   end
 
   if task.children then
-    result = result .. "\n" .. format(task, depth + 1)
+    result = result .. "\n" .. formatters.root(task, depth + 1)
   end
 
   return result
 end
 
--- Prints a taskpaper tree.
-format = function (tree, depth)
+-- Formats a taskpaper tree from the root.
+--
+-- Also used to format the contents of other things with children, like
+-- projects and tasks.
+function formatters.root(root, depth)
   depth = depth or 0
   local formatted = {}
 
-  for i = 1, #tree.children do
-    local item = tree.children[i]
-
+  for i, item in ipairs(root.children) do
     -- Add a blank line between project headers or notes if anything
     -- precedes them.
     if i ~= 1 and (item.kind == "project" or item.kind == "note") then
       table.insert(formatted, "")
     end
 
-    if item.kind == "project" then
-      table.insert(formatted, format_project(item, depth))
-    elseif item.kind == "task" then
-      table.insert(formatted, format_task(item, depth))
-    elseif item.kind == "note" then
-      table.insert(formatted, format_note(item, depth))
-    end
+    table.insert(formatted, format(item, depth))
   end
 
   return table.concat(formatted, "\n")
 end
 
+formatters.file = formatters.root
+
+-- Formats a taskpaper thing.
+format = function (thing, depth)
+  depth = depth or 0
+
+  local formatter = formatters[thing.kind]
+  if not formatter then
+    error(string.format("kind is unformattable: '%s'", thing.kind))
+  end
+
+  return formatter(thing, depth)
+end
+
 return {
-  format_task = format_task,
-  format_note = format_note,
-  format_project = format_project,
   format = format,
 }

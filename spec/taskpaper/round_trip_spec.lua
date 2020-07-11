@@ -2,6 +2,8 @@ local taskpaper = require 'taskpaper'
 
 local binstring = require 'luassert.formatters.binarystring'
 
+local examples = require 'spec.taskpaper.examples'
+
 describe("round trip", function ()
   setup(function ()
     assert:add_formatter(binstring)
@@ -12,14 +14,14 @@ describe("round trip", function ()
 
   describe("of tasks", function ()
     it("parses and reformats a task to the same string", function ()
-      local examples = {
+      local tasks = {
         "- do a thing",
         "- do a thing with a @tag",
         "- do a thing with @two @tags",
         "- do a thing with @valued(1, 2) @tags",
       }
 
-      for _, task in ipairs(examples) do
+      for _, task in ipairs(tasks) do
         assert.same(task, taskpaper.parse(task):totaskpaper())
       end
     end)
@@ -43,6 +45,23 @@ A project:
 Let's hope this works out OK!]]
 
       assert.same(example, taskpaper.parse(example):totaskpaper())
+    end)
+  end)
+
+  describe("through a file", function ()
+    it("results in the same blob", function ()
+      local path = os.tmpname()
+
+      local root = taskpaper.parse(examples.chunk)
+      root.kind = "file"
+      root.path = path
+      root = taskpaper.bless(root)
+
+      root:write()
+
+      local loaded = taskpaper.load_file(path)
+
+      assert.same(root, loaded)
     end)
   end)
 end)
