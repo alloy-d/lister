@@ -39,7 +39,7 @@ describe('mutation', function ()
     end)
   end)
 
-  describe('by removal', function ()
+  describe('by removal from root', function ()
     local chunk
     before_each(function ()
       chunk = taskpaper.parse(examples.chunk)
@@ -75,6 +75,20 @@ describe('mutation', function ()
       assert.equal(initial_children_count - 1, #project.children, "project has one fewer child")
       for i = 1, #project.children do
         assert.not_equal(nil, project.children[i], "no child is nil")
+      end
+    end)
+  end)
+
+  describe('by pruning', function ()
+    it('removes the expected item', function ()
+      local chunk = taskpaper.parse(examples.chunk)
+      local project = chunk.children[3]
+      local item = project.children[2]
+
+      item:prune()
+
+      for _, child in ipairs(project.children) do
+        assert.not_equal(item, child)
       end
     end)
   end)

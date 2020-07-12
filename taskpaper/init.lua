@@ -16,6 +16,7 @@ end
 hook_up(filer.write,              'write',          {'file'})
 
 hook_up(printer.format,           'totaskpaper',    {'root', 'project', 'task', 'note'})
+hook_up(mutation.prune,           'prune',          {'root', 'project', 'task', 'note'})
 hook_up(traversal.populate_paths, 'populate_paths', {'root', 'project', 'task'})
 hook_up(traversal.crawl,          'crawl',          {'root', 'project', 'task'})
 hook_up(traversal.lookup,         'lookup',         {'root', 'project', 'task'})
