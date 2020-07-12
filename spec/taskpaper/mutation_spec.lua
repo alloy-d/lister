@@ -1,9 +1,6 @@
 local taskpaper = require 'taskpaper'
 local mutation = require 'taskpaper.mutation'
 
-local tpmeta = require 'taskpaper.tables'
-local bless = tpmeta.bless
-
 local examples = require 'spec.taskpaper.examples'
 local helpers = require 'spec.taskpaper.helpers'
 local assert_subtable = helpers.assert_subtable
@@ -14,7 +11,7 @@ describe('mutation', function ()
 
     before_each(function ()
       chunk = taskpaper.parse(examples.chunk)
-      new_item = bless{
+      new_item = taskpaper.bless{
         kind = "task",
         text = "test appending",
       }

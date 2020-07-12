@@ -1,7 +1,6 @@
 local tplines = require 'taskpaper.lines'
-local tpmeta = require 'taskpaper.tables'
 
-local bless = tpmeta.bless
+local bless = require 'taskpaper.bless'
 
 local chunky = {}
 
