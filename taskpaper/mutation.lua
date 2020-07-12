@@ -17,13 +17,20 @@ function M.append(root, path, additional_thing)
   return adopt(new_parent, additional_thing)
 end
 
--- Removes the thing at `path` in `root`.
---
--- Returns the removed thing.
-function M.remove(root, path)
-  local parent, path_in_parent = root:lookup(path, 1)
+-- Returns the index of `child` in parent's children.
+local function find_index_of_child(parent, child)
+  for i, item in ipairs(parent.children) do
+    if item == child then
+      return i
+    end
+  end
+end
 
-  local child = table.remove(parent.children, path_in_parent[1])
+-- Removes the child at `index` in `parent`.
+--
+-- Returns the child.
+local function remove_child_by_index(parent, index)
+  local child = table.remove(parent.children, index)
 
   -- Reset positional data on the now-orphaned family tree.
   child.parent = nil
@@ -34,6 +41,22 @@ function M.remove(root, path)
   traversal.populate_paths(parent)
 
   return child
+end
+
+-- Removes the thing at `path` in `root`.
+--
+-- Returns the removed thing.
+function M.remove(root, path)
+  local parent, path_in_parent = root:lookup(path, 1)
+  return remove_child_by_index(parent, path_in_parent[1])
+end
+
+-- Removes an item from its parent's children.
+function M.prune(item)
+  local parent = item.parent
+  local index = find_index_of_child(parent, item)
+
+  return remove_child_by_index(parent, index)
 end
 
 -- Moves the thing at `from_path` in `from_root` to `to_path` in
