@@ -22,7 +22,9 @@ local lsp_cmd = parser:command("list-projects lsp", [[
 List all projects.
 
 ]])
-lsp_cmd:option("-p --show-paths", "Output paths in addition to project names."):args(0)
+lsp_cmd:option("-h --show-header", "Print a header as the first line."):args(0)
+lsp_cmd:option("-p --show-paths", "Also paths in addition to project names."):args(0)
+lsp_cmd:option("-l --show-lineage", "Also show lineage (human-readable paths)."):args(0)
 
 local show_cmd = parser:command("show", [[
 Show something (or some things).
@@ -79,18 +81,38 @@ local function find_files (dir)
   return files
 end
 
-local function list_projects (dir, show_paths)
+local function list_projects (dir, args)
   local files = find_files(dir)
   local roots = map(files, taskpaper.load_file)
+  local show_header, show_paths, show_lineage = args.show_header, args.show_paths, args.show_lineage
+
+  local function fields (project)
+    local data = {}
+    if show_paths then
+      table.insert(data, project.path)
+    end
+
+    table.insert(data, project.name)
+
+    if show_lineage then
+      table.insert(data, table.concat(project.lineage, "->"))
+    end
+
+    return table.unpack(data)
+  end
+
+  if show_header then
+    print(fields({
+      path = "Path",
+      name = "Project",
+      lineage = {"Lineage"},
+    }))
+  end
 
   for _, root in ipairs(roots) do
     for item in root:crawl() do
       if item.kind == "project" then
-        if show_paths then
-          print(item.path, item.name)
-        else
-          print(item.name)
-        end
+        print(fields(item))
       end
     end
   end
@@ -138,7 +160,7 @@ if args.command == "list-files" then
     print(files[i])
   end
 elseif args.command == "list-projects" then
-  list_projects(args.dir, args.show_paths)
+  list_projects(args.dir, args)
 elseif args.command == "show" then
   show(args.path)
 elseif args.command == "format" then

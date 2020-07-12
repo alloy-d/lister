@@ -15,9 +15,11 @@ end
 
 local Note, Task, Project = builder('note'), builder('task'), builder('project')
 
+local they = it
+
 describe('paths', function ()
   describe('generated', function ()
-    it('match what we expect', function ()
+    they('match what we expect', function ()
       local chunk = taskpaper.parse(examples.chunk)
       chunk.path = "(chunk)"
 
@@ -36,7 +38,7 @@ describe('paths', function ()
   end)
 
   describe('accessed', function ()
-    it('get the nodes we expect', function ()
+    they('get the nodes we expect', function ()
       local chunk = taskpaper.parse(examples.chunk)
 
       local function check(path, expectation)
@@ -48,6 +50,24 @@ describe('paths', function ()
       check(":3:3:1", Note())
       check(":3:6:2", Task({text = "do more things"}))
     end)
+  end)
+end)
+
+describe('lineage', function ()
+  it('shows the steps of nameable things to an item', function ()
+    local chunk = taskpaper.parse(examples.chunk)
+    chunk.path = "(chunk)"
+
+    local function check (path, expected_lineage)
+      local item = chunk:lookup(path)
+      assert.same(expected_lineage, item.lineage,
+          string.format('correct lineage at %s', path))
+    end
+
+    check(":1",     {"(chunk)"})
+    check(":3:1",   {"(chunk)", "Project"})
+    check(":3:3:1", {"(chunk)", "Project"})
+    check(":3:6:2", {"(chunk)", "Project", "Subproject"})
   end)
 end)
 

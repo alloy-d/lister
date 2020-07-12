@@ -9,6 +9,21 @@ function M.parse_path(path_string)
   return path
 end
 
+local function lineage_including_thing(thing)
+  local lineage = {}
+  local name = thing.name
+
+  if thing.parent then
+    lineage = lineage_including_thing(thing.parent)
+  end
+
+  if name then
+    lineage[#lineage + 1] = name
+  end
+
+  return lineage
+end
+
 -- Populate a thing's children's paths.
 --
 -- Populated paths will be strings separated by colons.
@@ -26,6 +41,7 @@ function M.populate_paths(thing)
 
   for i, child in ipairs(thing.children) do
     child.path = thing.path .. ':' .. i
+    child.lineage = lineage_including_thing(thing)
   end
 end
 
@@ -33,6 +49,7 @@ end
 -- paths.
 function M.unpopulate_paths(thing)
   thing.path = nil
+  thing.lineage = nil
 
   if thing.children then
     for _, child in ipairs(thing.children) do
