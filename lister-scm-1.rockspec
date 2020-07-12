@@ -26,12 +26,13 @@ build = {
   type = "builtin",
   modules = {
     ["taskpaper"] = "taskpaper/init.lua",
+    ["taskpaper.bless"] = "taskpaper/bless.lua",
     ["taskpaper.chunky"] = "taskpaper/chunky.lua",
     ["taskpaper.filer"] = "taskpaper/filer.lua",
     ["taskpaper.lines"] = "taskpaper/lines.lua",
+    ["taskpaper.metatables"] = "taskpaper/metatables.lua",
     ["taskpaper.mutation"] = "taskpaper/mutation.lua",
     ["taskpaper.printer"] = "taskpaper/printer.lua",
-    ["taskpaper.tables"] = "taskpaper/tables.lua",
     ["taskpaper.traversal"] = "taskpaper/traversal.lua",
   },
   install = {
