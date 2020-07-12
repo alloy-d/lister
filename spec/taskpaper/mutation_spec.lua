@@ -39,7 +39,7 @@ describe('mutation', function ()
     end)
   end)
 
-  describe('by removal from root', function ()
+  describe('by removal', function ()
     local chunk
     before_each(function ()
       chunk = taskpaper.parse(examples.chunk)
@@ -48,48 +48,49 @@ describe('mutation', function ()
       chunk = nil
     end)
 
-    it('removes the expected item', function ()
-      -- Remove the first thing in the example chunk, a note.
-      chunk:remove(":1")
+    describe('via root', function ()
+      it('removes the expected item', function ()
+        -- Remove the first thing in the example chunk, a note.
+        chunk:remove(":1")
 
-      -- Make sure the following items (a task and a project) have moved
-      -- up.
-      assert.same("task", chunk.children[1].kind)
-      assert.same("project", chunk.children[2].kind)
+        -- Make sure the following items (a task and a project) have moved
+        -- up.
+        assert.same("task", chunk.children[1].kind)
+        assert.same("project", chunk.children[2].kind)
 
-      -- Remove the second thing from the second thing (a project).
-      local second_thing_text = chunk:lookup(":2:2").text
-      local third_thing_text = chunk:lookup(":2:3").text
-      chunk:remove(":2:2")
-      local new_second_thing = chunk:lookup(":2:2")
-      assert.not_same(second_thing_text, new_second_thing.text)
-      assert.same(third_thing_text, new_second_thing.text)
+        -- Remove the second thing from the second thing (a project).
+        local second_thing_text = chunk:lookup(":2:2").text
+        local third_thing_text = chunk:lookup(":2:3").text
+        chunk:remove(":2:2")
+        local new_second_thing = chunk:lookup(":2:2")
+        assert.not_same(second_thing_text, new_second_thing.text)
+        assert.same(third_thing_text, new_second_thing.text)
+      end)
+
+      it('keeps the affected table as a sequence', function ()
+        local project = chunk:lookup(":3")
+        local initial_children_count = #project.children
+
+        chunk:remove(":3:2")
+
+        assert.equal(initial_children_count - 1, #project.children, "project has one fewer child")
+        for i = 1, #project.children do
+          assert.not_equal(nil, project.children[i], "no child is nil")
+        end
+      end)
     end)
 
-    it('keeps the affected table as a sequence', function ()
-      local project = chunk:lookup(":3")
-      local initial_children_count = #project.children
+    describe('by pruning', function ()
+      it('removes the expected item', function ()
+        local project = chunk.children[3]
+        local item = project.children[2]
 
-      chunk:remove(":3:2")
+        item:prune()
 
-      assert.equal(initial_children_count - 1, #project.children, "project has one fewer child")
-      for i = 1, #project.children do
-        assert.not_equal(nil, project.children[i], "no child is nil")
-      end
-    end)
-  end)
-
-  describe('by pruning', function ()
-    it('removes the expected item', function ()
-      local chunk = taskpaper.parse(examples.chunk)
-      local project = chunk.children[3]
-      local item = project.children[2]
-
-      item:prune()
-
-      for _, child in ipairs(project.children) do
-        assert.not_equal(item, child)
-      end
+        for _, child in ipairs(project.children) do
+          assert.not_equal(item, child)
+        end
+      end)
     end)
   end)
 
