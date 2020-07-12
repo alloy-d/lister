@@ -62,6 +62,8 @@ Let's hope this works out OK!]]
       local loaded = taskpaper.load_file(path)
 
       assert.same(root, loaded)
+
+      assert(os.remove(path))
     end)
   end)
 end)
