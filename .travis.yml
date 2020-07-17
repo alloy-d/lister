@@ -12,4 +12,4 @@ install:
   - luarocks make
 
 script:
-  - make test
+  - make ci
