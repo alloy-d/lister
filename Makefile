@@ -32,4 +32,4 @@ ci: luacheck test
 watch-test:
 	fd -e lua | entr -c busted ${BUSTED_ARGS}
 
-.PHONY: ci luacheck test watch-test
+.PHONY: ci clean luacheck test watch-test
