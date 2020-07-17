@@ -20,24 +20,17 @@ dependencies = {
 }
 build_dependencies = {
   "busted",
+  "fennel = 0.4.2",
   "luacheck",
 }
 build = {
-  type = "builtin",
-  modules = {
-    ["taskpaper"] = "taskpaper/init.lua",
-    ["taskpaper.bless"] = "taskpaper/bless.lua",
-    ["taskpaper.chunky"] = "taskpaper/chunky.lua",
-    ["taskpaper.filer"] = "taskpaper/filer.lua",
-    ["taskpaper.lines"] = "taskpaper/lines.lua",
-    ["taskpaper.metatables"] = "taskpaper/metatables.lua",
-    ["taskpaper.mutation"] = "taskpaper/mutation.lua",
-    ["taskpaper.printer"] = "taskpaper/printer.lua",
-    ["taskpaper.traversal"] = "taskpaper/traversal.lua",
+  type = "make",
+  build_variables = {
+    CFLAGS = "$(CFLAGS)",
   },
-  install = {
-    bin = {
-      ["lister"] = "bin/lister.lua"
-    }
-  }
+  install_variables = {
+    PREFIX = "$(PREFIX)",
+    BINDIR = "$(BINDIR)",
+    LUADIR = "$(LUADIR)",
+  },
 }
