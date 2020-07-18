@@ -32,7 +32,9 @@ luacheck:
 test:
 	busted --shuffle ${BUSTED_ARGS}
 
-ci: luacheck test
+ci:
+	$(MAKE) luacheck
+	$(MAKE) test
 
 watch-test:
 	fd -e lua | entr -c busted ${BUSTED_ARGS}
