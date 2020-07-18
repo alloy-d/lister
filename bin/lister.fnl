@@ -33,6 +33,14 @@
       (append result (f thing)))
     result))
 
+(lambda reverse [sequence]
+  "Returns a new sequence with the elements of `sequence` in reverse order."
+  (let [reversed []
+        n (length sequence)]
+    (each [i item (ipairs sequence)]
+      (tset reversed (- n (- i 1)) item))
+    reversed))
+
 (lambda drop [n things]
   "Returns `things` without the first `n` items."
   (let [start (+ 1 n)
@@ -101,7 +109,7 @@
         (append data (. project :path)))
       (append data (. project :name))
       (when (. args :show_lineage)
-        (append data (table.concat (. project :lineage) "->")))
+        (append data (table.concat (reverse (. project :lineage)) "<-")))
       (table.unpack data)))
 
   (let [files (find_files dir)
@@ -109,7 +117,7 @@
     (when (. args :show_header)
       (print (fields {:path "Path"
                       :name "Project"
-                      :lineage "Lineage"})))
+                      :lineage ["Lineage"]})))
 
     (each [_ root (ipairs roots)]
       (each [item (root:crawl)]
@@ -119,6 +127,7 @@
 (lambda show [args]
   "Show thing(s) at `args.path`."
   (let [paths (map parse_path (. args :path))
+        show_lineage? (. args :show_lineage)
         file_cache {}]
 
     (lambda load [filename]
@@ -130,6 +139,8 @@
       (let [file (load (. path 1))
             path_in_file (drop 1 path)
             item (file:lookup path_in_file)]
+        (when show_lineage?
+          (print (table.concat item.lineage " -> ") "\n"))
         (print (item:totaskpaper))))))
 
 (local parser
@@ -177,7 +188,10 @@
                    "  `show ~/todo.taskpaper:2:1` will show the second thing in that thing, &c."))]
   (-> "path"
       (show:argument "The path to the thing(s) to show.")
-      (: :args :+)))
+      (: :args :+))
+  (-> "-l --show-lineage"
+      (show:option "Print lineage above each thing.")
+      (: :args 0)))
 
 (let [fmt (parser:command
             "format fmt"
