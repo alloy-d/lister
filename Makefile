@@ -1,5 +1,8 @@
 BUSTED_ARGS ?= -e "TASKPAPER_INDENT_STRING = '  '"
 
+# 541 == empty do..end block; produced by fennel when importing macros.
+LUACHECK_ARGS ?= --no-max-line-length --ignore 541
+
 source_dirs := bin lister spec taskpaper tools
 lua_files := $(shell find $(source_dirs) -name '*.lua')
 fennel_files := $(shell find $(source_dirs) -name '*.fnl' -not -name '*_macros.fnl')
@@ -24,7 +27,7 @@ install: bin/lister $(compiled_lua_files) $(lua_files)
 	done
 
 luacheck:
-	luacheck --no-max-line-length $(source_dirs)
+	luacheck $(LUACHECK_ARGS) -- $(source_dirs)
 
 test:
 	busted --shuffle ${BUSTED_ARGS}
