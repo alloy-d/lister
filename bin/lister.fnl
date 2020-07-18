@@ -2,75 +2,14 @@
 (local taskpaper (require :taskpaper))
 (local parse_path (. (require :taskpaper.traversal) :parse_path))
 
+(local {: find_files} (require :lister.finding))
+
+(local {: map : reverse : drop} (require :tools.belt))
+(import-macros {: append} :tools.belt_macros)
+
 (lambda help [...]
   "Formats LINES as help text."
   (.. (table.concat (table.pack ...) "\n\n") "\n\n"))
-
-(lambda have_fd? []
-  "Does the system have `fd` available?"
-
-  (not= nil (os.execute "which fd >/dev/null 2>/dev/null")))
-
-(lambda ignore_file []
-  "Returns the path to an ignore file, if it exists.
-
-  Currently, just checks for ~/.lister-ignore.
-  Only used if `fd` is available."
-  (let [path (.. (os.getenv "HOME") "/.lister-ignore")
-        file (io.open path)]
-    (if file
-      (do (file:close)
-        path)
-      nil)))
-
-(macro append [sequence item]
-  `(tset ,sequence (+ 1 (length ,sequence)) ,item))
-
-(lambda map [f things]
-  "Returns the result of applying `f` to each entry in the sequence `things`."
-  (let [result []]
-    (each [_ thing (ipairs things)]
-      (append result (f thing)))
-    result))
-
-(lambda reverse [sequence]
-  "Returns a new sequence with the elements of `sequence` in reverse order."
-  (let [reversed []
-        n (length sequence)]
-    (each [i item (ipairs sequence)]
-      (tset reversed (- n (- i 1)) item))
-    reversed))
-
-(lambda drop [n things]
-  "Returns `things` without the first `n` items."
-  (let [start (+ 1 n)
-        end (length things)]
-    (table.move things start end 1 [])))
-
-(lambda lines [io-object]
-  "Returns the lines from `io-object` as a sequence."
-  (let [result []]
-    (each [line (io-object:lines)]
-      (append result line))
-    result))
-
-(lambda find_command [dir]
-  "What command should we run to find files?"
-  (if (have_fd?)
-    (string.format "fd -e taskpaper --no-ignore %s --hidden . '%s'"
-                   (let [file (ignore_file)]
-                     (if file
-                       (.. "--ignore-file " file)
-                       ""))
-                   dir)
-    (string.format "find '%s' -name '*.taskpaper'" dir)))
-
-(lambda find_files [dir]
-  "Get a list of the files we care about under `dir`."
-  (let [cmd (io.popen (find_command dir))
-        files (lines cmd)]
-    (cmd:close)
-    files))
 
 (lambda format_single_file [file ?in_place]
   "Loads and pretty-prints a file.  If `?in_place` is true, overwrites file."
