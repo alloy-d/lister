@@ -1,8 +1,8 @@
 BUSTED_ARGS ?= -e "TASKPAPER_INDENT_STRING = '  '"
 
-source_dirs := bin spec taskpaper
+source_dirs := bin lister spec taskpaper tools
 lua_files := $(shell find $(source_dirs) -name '*.lua')
-fennel_files := $(shell find $(source_dirs) -name '*.fnl')
+fennel_files := $(shell find $(source_dirs) -name '*.fnl' -not -name '*_macros.fnl')
 compiled_lua_files := $(fennel_files:.fnl=.lua)
 
 %.lua: %.fnl
@@ -19,10 +19,12 @@ clean:
 
 install: bin/lister $(compiled_lua_files) $(lua_files)
 	install -Dm755 -t $(BINDIR) bin/lister
-	find taskpaper -maxdepth 1 -name '*.lua' -exec install -Dm644 -t $(LUADIR)/taskpaper/ {} \;
+	for d in $(source_dirs); do \
+		find "$$d" -maxdepth 1 -name '*.lua' -exec install -Dm644 -t "$(LUADIR)/$$d/" {} \; ;\
+	done
 
 luacheck:
-	luacheck --no-max-line-length taskpaper/ spec/ bin/
+	luacheck --no-max-line-length $(source_dirs)
 
 test:
 	busted --shuffle ${BUSTED_ARGS}
