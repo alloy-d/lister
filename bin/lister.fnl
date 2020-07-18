@@ -12,6 +12,10 @@
   (not= nil (os.execute "which fd >/dev/null 2>/dev/null")))
 
 (lambda ignore_file []
+  "Returns the path to an ignore file, if it exists.
+
+  Currently, just checks for ~/.lister-ignore.
+  Only used if `fd` is available."
   (let [path (.. (os.getenv "HOME") "/.lister-ignore")
         file (io.open path)]
     (if file
@@ -23,17 +27,20 @@
   `(tset ,sequence (+ 1 (length ,sequence)) ,item))
 
 (lambda map [f things]
+  "Returns the result of applying `f` to each entry in the sequence `things`."
   (let [result []]
     (each [_ thing (ipairs things)]
       (append result (f thing)))
     result))
 
 (lambda drop [n things]
+  "Returns `things` without the first `n` items."
   (let [start (+ 1 n)
         end (length things)]
     (table.move things start end 1 [])))
 
 (lambda lines [io-object]
+  "Returns the lines from `io-object` as a sequence."
   (let [result []]
     (each [line (io-object:lines)]
       (append result line))
