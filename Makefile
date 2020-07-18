@@ -11,7 +11,13 @@ compiled_lua_files := $(fennel_files:.fnl=.lua)
 %.lua: %.fnl
 	fennel --compile $< > $@
 
-build: $(compiled_lua_files)
+.git/info/exclude: $(compiled_lua_files)
+	echo "" > $@
+	for f in $(compiled_lua_files); do \
+		echo "$$f" >> $@ ;\
+	done
+
+build: $(compiled_lua_files) .git/info/exclude
 
 bin/lister: bin/lister.lua
 	echo "#!/usr/bin/env lua" > $@
