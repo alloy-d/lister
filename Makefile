@@ -43,6 +43,6 @@ ci:
 	$(MAKE) test
 
 watch-test:
-	fd -e lua | entr -c busted ${BUSTED_ARGS}
+	sh -c "echo Makefile; fd -e lua -e fnl" | entr -c $(MAKE) -s test
 
 .PHONY: ci clean luacheck test watch-test
