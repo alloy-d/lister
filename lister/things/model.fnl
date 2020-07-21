@@ -36,12 +36,15 @@
 (fn index [thing key]
   "Provides some magic for accessing keys that need to be generated."
   (if (and (= key :lineage) (rooted? thing))
-    {}
+    []
+
+    (and (= key :path) (rooted? thing))
+    thing.name
 
     (or (= key :path) (= key :lineage))
     (do
-      (: thing.parent :populate_paths)
-      thing.key)
+      (traversal.populate_paths thing.parent)
+      (. thing key))
 
     (. (getmetatable thing) key)))
 

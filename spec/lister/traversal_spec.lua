@@ -56,7 +56,7 @@ end)
 describe('lineage', function ()
   it('shows the steps of nameable things to an item', function ()
     local chunk = taskpaper.parse(examples.chunk)
-    chunk.path = "(chunk)"
+    chunk.name = "(chunk)"
 
     local function check (path, expected_lineage)
       local item = chunk:lookup(path)
@@ -66,7 +66,7 @@ describe('lineage', function ()
 
     check(":1",     {"(chunk)"})
     check(":3:1",   {"(chunk)", "Project"})
-    check(":3:3:1", {"(chunk)", "Project"})
+    check(":3:3:1", {"(chunk)", "Project", "do another thing"})
     check(":3:6:2", {"(chunk)", "Project", "Subproject"})
   end)
 end)
