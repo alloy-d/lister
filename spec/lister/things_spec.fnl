@@ -1,4 +1,4 @@
-(import-macros {: context : test : before-each : after-each} :spec.busted_macros)
+(import-macros {: context : test} :spec.busted_macros)
 
 (local things (require :lister.things))
 
@@ -17,9 +17,9 @@
       (assert.true (things.has-tag? (sample-task) :tag)))
 
     (test "find-tag returns true and nil"
-      (let [result (table.pack (things.find-tag (sample-task) :tag))]
-        (assert.true (. result 1) "first value is true")
-        (assert.nil (. result 2)))))
+      (let [(found vals) (things.find-tag (sample-task) :tag)]
+        (assert.true found "first value is true")
+        (assert.nil vals))))
 
   (context "when a thing does not have a tag"
     (test "has-tag? returns false"
