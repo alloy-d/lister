@@ -42,7 +42,7 @@ local function format_tag(tag)
 end
 
 function formatters.task(task, depth)
-  local result = string.format("%s- %s", indent(depth), task.text)
+  local result = string.format("%s- %s", indent(depth), task.name)
   if task.tags then
     for _, tag in ipairs(task.tags) do
       result = result .. " " .. format_tag(tag)
