@@ -1,4 +1,4 @@
-BUSTED_ARGS ?= -e "TASKPAPER_INDENT_STRING = '  '"
+BUSTED_ARGS ?= --helper "spec/setup.lua" # -v
 
 # 541 == empty do..end block; produced by fennel when importing macros.
 LUACHECK_ARGS ?= --no-max-line-length --ignore 541
