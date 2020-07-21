@@ -36,11 +36,11 @@ luacheck:
 	luacheck $(LUACHECK_ARGS) -- $(source_dirs)
 
 test: $(compiled_lua_files)
-	busted --shuffle ${BUSTED_ARGS}
+	busted ${BUSTED_ARGS}
 
 ci:
 	$(MAKE) luacheck
-	$(MAKE) test
+	$(MAKE) test BUSTED_ARGS="$(BUSTED_ARGS) --shuffle"
 
 watch-test:
 	sh -c "echo Makefile; fd -e lua -e fnl" | entr -c $(MAKE) -s test
