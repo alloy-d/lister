@@ -1,5 +1,6 @@
 local chunky = require 'taskpaper.chunky'
-local bless = require 'taskpaper.bless'
+local printer = require 'taskpaper.printer'
+local bless = require('lister.things').bless
 
 local M = {}
 
@@ -18,7 +19,7 @@ end
 function M.write (self)
   local f = assert(io.open(self.path, 'w'))
 
-  f:write(self:totaskpaper())
+  f:write(printer.format(self))
 
   f:close()
 end

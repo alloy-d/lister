@@ -1,5 +1,6 @@
 local taskpaper = require 'taskpaper'
-local mutation = require 'taskpaper.mutation'
+local mutation = require 'lister.things.mutation'
+local bless = require 'lister.things'.bless
 
 local examples = require 'spec.taskpaper.examples'
 local helpers = require 'spec.taskpaper.helpers'
@@ -11,7 +12,7 @@ describe('mutation', function ()
 
     before_each(function ()
       chunk = taskpaper.parse(examples.chunk)
-      new_item = taskpaper.bless{
+      new_item = bless{
         kind = "task",
         text = "test appending",
       }
