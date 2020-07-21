@@ -17,14 +17,14 @@ local function Project (header, depth)
   }
 end
 
-local function Task (text, depth, tags)
-  if not text then
+local function Task (name, depth, tags)
+  if not name then
     return nil
   end
 
   return bless{
     kind = "task",
-    text = text,
+    name = name,
     tags = tags,
     parent = nil,
     _depth = depth,

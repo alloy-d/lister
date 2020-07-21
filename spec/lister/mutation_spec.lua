@@ -60,12 +60,12 @@ describe('mutation', function ()
         assert.same("project", chunk.children[2].kind)
 
         -- Remove the second thing from the second thing (a project).
-        local second_thing_text = chunk:lookup(":2:2").text
-        local third_thing_text = chunk:lookup(":2:3").text
+        local second_thing_name = chunk:lookup(":2:2").name
+        local third_thing_name = chunk:lookup(":2:3").name
         chunk:remove(":2:2")
         local new_second_thing = chunk:lookup(":2:2")
-        assert.not_same(second_thing_text, new_second_thing.text)
-        assert.same(third_thing_text, new_second_thing.text)
+        assert.not_same(second_thing_name, new_second_thing.name)
+        assert.same(third_thing_name, new_second_thing.name)
       end)
 
       it('keeps the affected table as a sequence', function ()

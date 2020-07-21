@@ -48,7 +48,7 @@ describe('paths', function ()
       check(":1",     Note())
       check(":3",     Project({name = "Project"}))
       check(":3:3:1", Note())
-      check(":3:6:2", Task({text = "do more things"}))
+      check(":3:6:2", Task({name = "do more things"}))
     end)
   end)
 end)
@@ -77,17 +77,17 @@ describe('crawling', function ()
     local expectations = {
       {kind = "root"},
       Note(),
-      Task({text = "test a top-level task"}),
+      Task({name = "test a top-level task"}),
       Project({name = "Project"}),
       Note(),
-      Task({text = "do a thing"}),
-      Task({text = "do another thing"}),
+      Task({name = "do a thing"}),
+      Task({name = "do another thing"}),
       Note(),
       Note({lines = {"This next thing is not special, but it comes after this note."}}),
-      Task({text = "do a final thing"}),
+      Task({name = "do a final thing"}),
       Project({name = "Subproject"}),
       Note({lines = {"This project is a part of that other project."}}),
-      Task({text = "do more things"}),
+      Task({name = "do more things"}),
       Note({lines = {"This is a final note in the first project."}}),
       Note({lines = {"And with this note, we have completed our example!"}}),
     }

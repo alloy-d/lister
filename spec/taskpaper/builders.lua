@@ -7,10 +7,10 @@ function builders.Note(...)
     lines = {...},
   }
 end
-function builders.Task(text, tags, children)
+function builders.Task(name, tags, children)
   return {
     kind = "task",
-    text = text,
+    name = name,
     tags = tags,
     children = children,
   }
