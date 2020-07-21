@@ -1,6 +1,6 @@
 (local argparse (require :argparse))
 (local taskpaper (require :taskpaper))
-(local parse_path (. (require :taskpaper.traversal) :parse_path))
+(local parse_path (. (require :lister.things.traversal) :parse_path))
 
 (local {: find_files} (require :lister.finding))
 

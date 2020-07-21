@@ -1,4 +1,6 @@
 local taskpaper = require 'taskpaper'
+local filer = require 'taskpaper.filer'
+local bless = require 'lister.things'.bless
 
 local binstring = require 'luassert.formatters.binarystring'
 
@@ -22,7 +24,7 @@ describe("round trip", function ()
       }
 
       for _, task in ipairs(tasks) do
-        assert.same(task, taskpaper.parse(task):totaskpaper())
+        assert.same(task, taskpaper.format(taskpaper.parse(task)))
       end
     end)
   end)
@@ -44,7 +46,7 @@ A project:
 
 Let's hope this works out OK!]]
 
-      assert.same(example, taskpaper.parse(example):totaskpaper())
+      assert.same(example, taskpaper.format(taskpaper.parse(example)))
     end)
   end)
 
@@ -55,9 +57,9 @@ Let's hope this works out OK!]]
       local root = taskpaper.parse(examples.chunk)
       root.kind = "file"
       root.path = path
-      root = taskpaper.bless(root)
+      root = bless(root)
 
-      root:write()
+      filer.write(root)
 
       local loaded = taskpaper.load_file(path)
 

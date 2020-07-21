@@ -1,0 +1,1 @@
+(require :lister.things.model)

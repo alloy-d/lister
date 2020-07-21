@@ -22,6 +22,9 @@
 ;; a task, so although our model allows other things to have them, this
 ;; is unlikely to happen (at least as of this writing).
 
+(local mutation (require :lister.things.mutation))
+(local traversal (require :lister.things.traversal))
+
 (lambda rooted? [thing]
   "Is this thing a root?"
   (not thing.parent))
@@ -38,9 +41,21 @@
     (or (= key :path) (= key :lineage))
     (do
       (: thing.parent :populate_paths)
-      thing.key)))
+      thing.key)
 
-(local thing-metatable {:__index index})
+    (. (getmetatable thing) key)))
+
+(local thing-metatable
+  {:__index index
+
+   :crawl traversal.crawl
+   :lookup traversal.lookup
+   :populate_paths traversal.populate_paths
+
+   :append mutation.append
+   :remove mutation.remove
+   :prune mutation.prune
+   })
 
 (lambda bless [thing]
   "Sets the metatable for `thing` and returns it."

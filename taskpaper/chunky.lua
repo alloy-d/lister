@@ -1,6 +1,6 @@
 local tplines = require 'taskpaper.lines'
 
-local bless = require 'taskpaper.bless'
+local bless = require('lister.things').bless
 
 local chunky = {}
 

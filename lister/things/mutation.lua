@@ -1,6 +1,6 @@
 local M = {}
 
-local traversal = require 'taskpaper.traversal'
+local traversal = require 'lister.things.traversal'
 
 -- Takes an `additional_thing`, and appends it as a child of `thing`.
 local function adopt(new_parent, new_child)
