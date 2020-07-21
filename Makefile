@@ -35,7 +35,7 @@ install: bin/lister $(compiled_lua_files) $(lua_files)
 luacheck:
 	luacheck $(LUACHECK_ARGS) -- $(source_dirs)
 
-test:
+test: $(compiled_lua_files)
 	busted --shuffle ${BUSTED_ARGS}
 
 ci:
