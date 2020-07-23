@@ -43,11 +43,10 @@
           :show_paths show-paths?} args)
 
   (fn show [thing]
-    (let [showable []
-          thing-depth (if show-filenames? 1 0)]
+    (let [showable []]
       (when show-paths?
         (append showable thing.path))
-      (append showable (taskpaper.format thing thing-depth))
+      (append showable (taskpaper.format thing (if show-filenames? 1 0)))
 
       (print (table.unpack showable))))
 
