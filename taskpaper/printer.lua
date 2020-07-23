@@ -64,7 +64,7 @@ function formatters.root(root, depth)
   depth = depth or 0
   local formatted = {}
 
-  for i, item in ipairs(root.children) do
+  for i, item in ipairs(root.children or {}) do
     -- Add a blank line between project headers or notes if anything
     -- precedes them.
     if i ~= 1 and (item.kind == "project" or item.kind == "note") then
