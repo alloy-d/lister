@@ -1,4 +1,5 @@
 local taskpaper = require 'taskpaper'
+local traversal = require 'lister.things.traversal'
 
 local examples = require 'spec.taskpaper.examples'
 local helpers = require 'spec.taskpaper.helpers'
@@ -94,6 +95,30 @@ describe('crawling', function ()
 
     local i = 0
     for thing in chunk:crawl() do
+      i = i + 1
+      if expectations[i] then
+        assert_subtable(expectations[i], thing)
+      end
+    end
+
+    assert.is_true(i >= #expectations, 'iterator returned at least as many things as expected')
+  end)
+end)
+
+describe('filtering', function ()
+  it('returns a sequence of things passing a test, in depth-first order', function ()
+    local chunk = taskpaper.parse(examples.chunk)
+    local expectations = {
+      Project({name = "Project"}),
+      Project({name = "Subproject"}),
+    }
+
+    local function test(thing)
+      return thing.kind == "project"
+    end
+
+    local i = 0
+    for thing in traversal.filter(chunk, test) do
       i = i + 1
       if expectations[i] then
         assert_subtable(expectations[i], thing)

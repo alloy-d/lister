@@ -1,8 +1,10 @@
 (local argparse (require :argparse))
 (local taskpaper (require :taskpaper))
-(local parse_path (. (require :lister.things.traversal) :parse_path))
+
+(local {: parse_path : filter} (require :lister.things.traversal))
 
 (local {: find_files} (require :lister.finding))
+(local {: has-tag?} (require :lister.things))
 
 (local {: map : reverse : drop} (require :tools.belt))
 (import-macros {: append} :tools.belt_macros)
@@ -34,6 +36,30 @@
     (each [_ file (ipairs files)]
       (format_single_file file in_place))))
 
+(lambda find_tagged [dir args]
+  "Print all the things tagged with `args.tag` under `dir`"
+  (local {: tag
+          :show_filenames show-filenames?
+          :show_paths show-paths?} args)
+
+  (fn show [thing]
+    (let [showable []
+          thing-depth (if show-filenames? 1 0)]
+      (when show-paths?
+        (append showable thing.path))
+      (append showable (taskpaper.format thing thing-depth))
+
+      (print (table.unpack showable))))
+
+  (let [files (find_files dir)
+        roots (map taskpaper.load_file files)]
+    (each [_ root (ipairs roots)]
+      (when show-filenames?
+        (print (.. root.path ":")))
+      (each [item (filter root #(has-tag? $1 tag))]
+        (show item))
+      (when show-filenames? (print)))))
+
 (lambda list_files [dir]
   "Print all relevant files under `dir`."
   (each [_ file (ipairs (find_files dir))]
@@ -59,9 +85,8 @@
                       :lineage ["Lineage"]})))
 
     (each [_ root (ipairs roots)]
-      (each [item (root:crawl)]
-        (when (= :project (. item :kind))
-          (print (fields item)))))))
+      (each [item (filter root #(= $1.kind :project))]
+        (print (fields item))))))
 
 (lambda show [args]
   "Show thing(s) at `args.path`."
@@ -143,9 +168,24 @@
       (fmt:option "Rewrite the file instead of printing to stdout.")
       (: :args 0)))
 
+(let [ft (parser:command
+           "find-tagged ft"
+           (help "Print the things with a given tag."))]
+  (-> "tag"
+      (ft:argument "The tag to check for.")
+      (: :args 1))
+
+  (-> "-f --show-filenames"
+      (ft:option "Print tasks grouped by filename.")
+      (: :args 0))
+  (-> "-p --show-paths"
+      (ft:option "Show path for each thing.")
+      (: :args 0)))
+
 (let [args (parser:parse)
       dir (. args :dir)]
   (match (. args :command)
+    "find-tagged" (find_tagged dir args)
     "format" (format args)
     "list-files" (list_files dir)
     "list-projects" (list_projects dir args)

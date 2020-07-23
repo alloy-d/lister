@@ -104,4 +104,22 @@ function M.crawl(thing)
   end
 end
 
+-- Takes an `iterator` (a stateful iterator that takes no argument and
+-- produces one value, e.g. the result of crawl()) and returns a similar
+-- iterator that returns only items returned by that iterator that pass
+-- `test`.
+function M.filtered(test, iterator)
+  return function ()
+    for item in iterator do
+      if test(item) then
+        return item
+      end
+    end
+  end
+end
+
+function M.filter(thing, test)
+  return M.filtered(test, M.crawl(thing))
+end
+
 return M

@@ -1,4 +1,5 @@
 (local {: lines} (require :tools.belt))
+(import-macros {: append} :tools.belt_macros)
 
 (lambda have_fd? []
   "Does the system have `fd` available?"
