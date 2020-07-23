@@ -21,7 +21,7 @@
         (f:write (taskpaper.format tree))
         (f:close)))
     (lambda write_to_stdout []
-      (print (.. (. tree :path) ":\n"))
+      (print (.. tree.name ":\n"))
       (print (taskpaper.format tree 1))
       (print "\n"))
 
