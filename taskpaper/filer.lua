@@ -11,13 +11,13 @@ function M.load_file (filename)
 
   local parsed = chunky.parse(contents)
   parsed.kind = "file"
-  parsed.path = filename
+  parsed.name = filename
 
   return bless(parsed)
 end
 
 function M.write (self)
-  local f = assert(io.open(self.path, 'w'))
+  local f = assert(io.open(self.name, 'w'))
 
   f:write(printer.format(self))
 

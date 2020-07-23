@@ -56,7 +56,7 @@ Let's hope this works out OK!]]
 
       local root = taskpaper.parse(examples.chunk)
       root.kind = "file"
-      root.path = path
+      root.name = path
       root = bless(root)
 
       filer.write(root)
