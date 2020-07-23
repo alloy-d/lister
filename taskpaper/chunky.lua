@@ -61,8 +61,9 @@ end
 function chunky.parse (chunk)
   local root = bless{
     kind = "root",
-    path = "",
+    path = "", -- FIXME: probably shouldn't be set explicitly.
     parent = nil,
+    children = {},
     _depth = 1,
   }
   -- Create a dummy previous item that could never have children.
