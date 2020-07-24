@@ -1,7 +1,8 @@
 BUSTED_ARGS ?= --helper "spec/setup.lua" # -v
 
+# 311 == value assigned to variable is overwritten before use.
 # 541 == empty do..end block; produced by fennel when importing macros.
-LUACHECK_ARGS ?= --no-max-line-length --ignore 541
+LUACHECK_ARGS ?= --codes --no-max-line-length --ignore 311 541
 
 source_dirs := bin lister lister/things spec taskpaper tools
 lua_files := $(shell find $(source_dirs) -name '*.lua')

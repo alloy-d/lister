@@ -55,9 +55,8 @@
    :lookup traversal.lookup
    :populate_paths traversal.populate_paths
 
-   :append mutation.append
-   :remove mutation.remove
-   :prune mutation.prune
+   :adopt! mutation.adopt!
+   :prune! mutation.prune!
    })
 
 (lambda bless [thing]
@@ -88,60 +87,20 @@
 (defmaker note [tbl]
   (assert (not tbl.children) "note cannot have children"))
 
-(lambda tag [name ...]
-  {:name name
-   :values (when (< 0 (select :# ...)) [...])})
-
 (lambda root-of [thing]
   "Returns the root of the tree containing `thing`."
 
   (if (rooted? thing) thing
     (root-of thing.parent)))
 
-(fn find-tag [{: tags} tag-name]
-  "Checks a given thing for the tag with `tag-name`.
-
-  If not found, returns nil.
-  If found, returns true and the table of values."
-
-  (lambda find [tags index]
-    (when (and tags (<= index (length tags)))
-      (let [tag (. tags index)]
-        (if (= tag.name tag-name)
-          (values true tag.values)
-          (find tags (+ 1 index))))))
-
-  (when tags
-    (find tags 1)))
-
-(lambda has-tag? [thing tag-name ?tag-value]
-  "Does this thing have `tag-name`, optionally with `?tag-value`?"
-
-  (fn contains-value? [vals index]
-    "Does this list of values have the value we're looking for?"
-    (if
-      (not ?tag-value) true
-      (not vals) false
-      (> index (length vals)) false
-      (= (. vals index) ?tag-value) true
-      (contains-value? vals (+ 1 index))))
-
-  (let [(tag vals) (find-tag thing tag-name)]
-    (if tag
-      (contains-value? vals 1)
-      false)))
-
 {: rooted?
  : named?
  : bless
- : has-tag?
- : find-tag
  : root-of
 
  : root
  : file
  : project
  : task
- : note
+ : note}
 
- : tag}
