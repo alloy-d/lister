@@ -1,13 +1,25 @@
 (local argparse (require :argparse))
 (local taskpaper (require :taskpaper))
+(local {:write write!} (require :taskpaper.filer))
 
 (local {: parse_path : filter} (require :lister.things.traversal))
 
 (local {: find_files} (require :lister.finding))
-(local {: has-tag?} (require :lister.things))
+
+(local things (require :lister.things))
+(local mutation (require :lister.things.mutation))
+(local {: has-tag?} things)
+(local {: adopt! : prune!} mutation)
 
 (local {: map : reverse : drop} (require :tools.belt))
 (import-macros {: append} :tools.belt_macros)
+
+(macro each-root [[root-sym dir] ...]
+  (assert (> (select :# ...) 0) "body expected")
+  `(let [files# (find_files ,dir)
+         roots# (map taskpaper.load_file files#)]
+     (each [_# ,root-sym (ipairs roots#)]
+       ,...)))
 
 (lambda help [...]
   "Formats LINES as help text."
@@ -50,14 +62,48 @@
 
       (print (table.unpack showable))))
 
-  (let [files (find_files dir)
-        roots (map taskpaper.load_file files)]
-    (each [_ root (ipairs roots)]
-      (when show-filenames?
-        (print (.. root.path ":")))
-      (each [item (filter root #(has-tag? $1 tag))]
-        (show item))
-      (when show-filenames? (print)))))
+  (each-root [root dir]
+             (when show-filenames?
+               (print (.. root.name ":")))
+             (each [item (filter root #(has-tag? $1 tag))]
+               (show item))
+             (when show-filenames? (print))))
+
+(lambda prune [dir {: tag :archive archive-name}]
+  "Move all the things with `tag` under `dir` to the file `archive`."
+  (print "pruning" tag archive-name)
+
+  (local archive (or (taskpaper.load_file archive-name)
+                     (things.file {:name archive-name})))
+  (local moveable [])
+  (local changed {})
+
+  (lambda changed! [file]
+    "Mark `file` as changed, so we save it later."
+    (tset changed file true))
+
+  (lambda write-changed! []
+    "Save the roots we've marked as changed."
+    (each [file (pairs changed)]
+      (print "writing changed file" file)
+      (write! file)))
+
+  (each-root [root dir]
+             (when (not= root.name archive-name)
+               (each [item (filter root #(has-tag? $1 tag))]
+                 (print "moveable" (taskpaper.format item))
+                 (append moveable item))))
+
+  (each [_ thing (ipairs moveable)]
+    (changed! (things.root-of thing))
+    (prune! thing)
+    ; TODO: add metadata to moved thing
+    (adopt! archive thing))
+
+  (when (> (length moveable) 0)
+    (print "will write things")
+    (write! archive)
+    (write-changed!)))
 
 (lambda list_files [dir]
   "Print all relevant files under `dir`."
@@ -137,10 +183,15 @@
 
 (let [prune (parser:command
               "prune"
-              (help "Prune a file by moving done items to the archive."))]
-  (-> "file"
-      (prune:argument "The file(s) to prune.")
-      (: :args :+)))
+              (help "Prune files by moving tagged (`done`, by default) items to the archive."))]
+  (-> "archive"
+      (prune:argument "The file to move pruned items into.")
+      (: :args 1))
+
+  (-> "-t --tag"
+      (prune:option "Prune items with this tag.")
+      (: :args 1)
+      (: :default "done")))
 
 (let [show (parser:command
              "show"
@@ -188,5 +239,6 @@
     "format" (format args)
     "list-files" (list_files dir)
     "list-projects" (list_projects dir args)
+    "prune" (prune dir args)
     "show" (show args)))
 

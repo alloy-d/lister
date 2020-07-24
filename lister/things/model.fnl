@@ -92,6 +92,12 @@
   {:name name
    :values (when (< 0 (select :# ...)) [...])})
 
+(lambda root-of [thing]
+  "Returns the root of the tree containing `thing`."
+
+  (if (rooted? thing) thing
+    (root-of thing.parent)))
+
 (fn find-tag [{: tags} tag-name]
   "Checks a given thing for the tag with `tag-name`.
 
@@ -130,6 +136,7 @@
  : bless
  : has-tag?
  : find-tag
+ : root-of
 
  : root
  : file
