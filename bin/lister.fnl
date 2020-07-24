@@ -18,7 +18,7 @@
   (assert (> (select :# ...) 0) "body expected")
   `(let [files# (find_files ,dir)
          roots# (map taskpaper.load_file files#)]
-     (each [_# ,root-sym (ipairs roots#)]
+     (each [,(sym :_) ,root-sym (ipairs roots#)]
        ,...)))
 
 (lambda help [...]
