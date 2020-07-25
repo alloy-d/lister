@@ -5,7 +5,11 @@ local bless = require('lister.things').bless
 local M = {}
 
 function M.load_file (filename)
-  local f = io.open(filename, 'r')
+  local f, err = io.open(filename, 'r')
+  if not f then
+    return nil, err
+  end
+
   local contents = f:read('a')
   f:close()
 
@@ -17,11 +21,21 @@ function M.load_file (filename)
 end
 
 function M.write (self)
-  local f = assert(io.open(self.name, 'w'))
+  local _
+  local f, err = io.open(self.name, 'w')
+  if not f then
+    return nil, err
+  end
 
-  f:write(printer.format(self))
+  _, err = f:write(printer.format(self))
 
   f:close()
+
+  if err then
+    return nil, err
+  end
+
+  return true
 end
 
 return M
