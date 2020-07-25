@@ -128,7 +128,11 @@ processing it.
 
 Other things I'd like to do:
 
-- Some end-to-end CLI testing.
+- Add some end-to-end CLI testing.
+- Allow for user-defined commands or filtering criteria.  Simple
+  examples might be finding things by context, time required, or energy
+  level.  Each of those is probably defined in a specific and personal
+  way that would be best implemented specifically and personally.
 - Write a real parser for taskpaper.  The regex thing works, but I'm
   interested in doing it The Right Way.
 - Finish converting the code to Fennel.  Along the way of writing this,
