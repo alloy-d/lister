@@ -4,6 +4,8 @@
 
 (lambda adopt! [new-parent new-child]
   "Makes `new-child` a child of `new-parent`."
+  (when (not new-parent.children)
+    (tset new-parent :children []))
   (append new-parent.children new-child)
   (tset new-child :parent new-parent))
 

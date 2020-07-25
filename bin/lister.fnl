@@ -8,8 +8,10 @@
 
 (local things (require :lister.things))
 (local mutation (require :lister.things.mutation))
-(local {: has-tag?} things)
+(local tagging (require :lister.things.tagging))
+
 (local {: adopt! : prune!} mutation)
+(local {: has-tag? : set-tag!} tagging)
 
 (local {: map : reverse : drop} (require :tools.belt))
 (import-macros {: append} :tools.belt_macros)
@@ -96,14 +98,19 @@
 
   (each [_ thing (ipairs moveable)]
     (changed! (things.root-of thing))
+    (set-tag! thing :lister-archived-from
+              (table.concat thing.lineage ", "))
     (prune! thing)
-    ; TODO: add metadata to moved thing
     (adopt! archive thing))
 
   (when (> (length moveable) 0)
-    (print "will write things")
-    (write! archive)
-    (write-changed!)))
+    (let [(ok? err) (write! archive)]
+      (if ok?
+        (write-changed!)
+        (do
+          (io.stderr:write (string.format "Couldn't write archive file: %s\n\n" err))
+          (io.stderr:write "Leaving other files unchanged.\n")
+          (os.exit false))))))
 
 (lambda list_files [dir]
   "Print all relevant files under `dir`."

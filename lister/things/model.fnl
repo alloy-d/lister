@@ -23,6 +23,7 @@
 ;; is unlikely to happen (at least as of this writing).
 
 (local mutation (require :lister.things.mutation))
+(local tagging (require :lister.things.tagging))
 (local traversal (require :lister.things.traversal))
 
 (lambda rooted? [thing]
@@ -57,6 +58,10 @@
 
    :adopt! mutation.adopt!
    :prune! mutation.prune!
+
+   :has-tag? tagging.has-tag?
+   :set-tag! tagging.set-tag!
+   :remove-tag! tagging.remove-tag!
    })
 
 (lambda bless [thing]
