@@ -152,9 +152,13 @@
       (let [file (load (. path 1))
             path_in_file (drop 1 path)
             item (file:lookup path_in_file)]
-        (when show_lineage?
-          (print (table.concat item.lineage " -> ") "\n"))
-        (print (item:totaskpaper))))))
+        (if item
+          (do
+            (when show_lineage?
+              (print (table.concat item.lineage " -> ") "\n"))
+            (print (taskpaper.format item)))
+          (io.stderr:write (string.format "'%s' not found\n"
+                                          (table.concat path ":"))))))))
 
 (local parser
   (-> (argparse)
