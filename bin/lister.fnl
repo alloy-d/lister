@@ -73,7 +73,6 @@
 
 (lambda prune [dir {: tag :archive archive-name}]
   "Move all the things with `tag` under `dir` to the file `archive`."
-  (print "pruning" tag archive-name)
 
   (local archive (or (taskpaper.load_file archive-name)
                      (things.file {:name archive-name})))
@@ -87,13 +86,11 @@
   (lambda write-changed! []
     "Save the roots we've marked as changed."
     (each [file (pairs changed)]
-      (print "writing changed file" file)
       (write! file)))
 
   (each-root [root dir]
              (when (not= root.name archive-name)
                (each [item (filter root #(has-tag? $1 tag))]
-                 (print "moveable" (taskpaper.format item))
                  (append moveable item))))
 
   (each [_ thing (ipairs moveable)]
