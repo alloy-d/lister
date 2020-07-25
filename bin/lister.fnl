@@ -25,7 +25,7 @@
 
 (lambda help [...]
   "Formats LINES as help text."
-  (.. (table.concat (table.pack ...) "\n\n") "\n\n"))
+  (.. (table.concat (table.pack ...) "\n") "\n"))
 
 (lambda format_single_file [file ?in_place]
   "Loads and pretty-prints a file.  If `?in_place` is true, overwrites file."
@@ -65,11 +65,11 @@
       (print (table.unpack showable))))
 
   (each-root [root dir]
-             (when show-filenames?
-               (print (.. root.name ":")))
-             (each [item (filter root #(has-tag? $1 tag))]
-               (show item))
-             (when show-filenames? (print))))
+    (when show-filenames?
+      (print (.. root.name ":")))
+    (each [item (filter root #(has-tag? $1 tag))]
+      (show item))
+    (when show-filenames? (print))))
 
 (lambda prune [dir {: tag :archive archive-name}]
   "Move all the things with `tag` under `dir` to the file `archive`."
@@ -89,9 +89,9 @@
       (write! file)))
 
   (each-root [root dir]
-             (when (not= root.name archive-name)
-               (each [item (filter root #(has-tag? $1 tag))]
-                 (append moveable item))))
+    (when (not= root.name archive-name)
+      (each [item (filter root #(has-tag? $1 tag))]
+        (append moveable item))))
 
   (each [_ thing (ipairs moveable)]
     (changed! (things.root-of thing))
@@ -160,89 +160,140 @@
   (-> (argparse)
       (: :name "lister")
       (: :description "List management.")
+      (: :help_vertical_space 1)
       (: :command_target "command")))
 
-(parser:option
-  "-d --dir"
-  "The root directory to search within."
-  (os.getenv "HOME"))
+(parser:group
+  "Locating files"
+  (->
+    (parser:option
+      "-d --dir"
+      (help "Specifies where to search for files."
+            "Used by commands that don't take specific file arguments."
+            ""
+            "By default, finds files matching *.taskpaper anywhere under the given directory."
+            ""
+            "If `fd` is on $PATH, it will be used for searching, with the following options:"
+            "  - --no-ignore, so that you can taskpaper files in your VCS"
+            "  - --hidden, so that you can have taskpaper files in hidden directories"
+            ""
+            "If ~/.lister-ignore exists, it will be given to fd as an ignore file."
+            ""
+            "If `fd` is not available, uses a naive invocation of `find`, with no filtering.")
+      (os.getenv "HOME"))
+    (: :argname "<root-dir>")))
 
-(-> (parser:command
-      "list-files lsf"
-      (help "List the files that would be searched for projects and tasks."
-            "Uses $HOME by default, but can be changed with --dir.")))
+(parser:group
+  "Output flags"
+  (parser:flag
+    "-p --show-paths"
+    (help "For commands where it makes sense, include the \"path\" in the output."
+          ""
+          "Paths are machine-readable locators for things where they are *right now*."
+          "Any change to the contents of a file could invalidate its contents' paths."
+          ""
+          "Examples:"
+          "- `~/todo.taskpaper:2` describes the second thing in ~/todo.taskpaper"
+          "- `~/todo.taskpaper:2:1` describes the first thing in that thing, &c."))
 
-(let [lsp (parser:command
-            "list-projects lsp"
-            (help "List all projects."))]
-  (-> "-h --show-header"
-      (lsp:option "Print a header as the first line.")
-      (: :args 0))
-  (-> "-p --show-paths"
-      (lsp:option "Show paths in addition to project names.")
-      (: :args 0))
-  (-> "-l --show-lineage"
-      (lsp:option "Also show lineage (human-readable paths).")
-      (: :args 0)))
+  (parser:flag
+    "-l --show-lineage"
+    (help "For commands where it makes sense, include the \"lineage\" in the output."
+          "Lineage is the human-sensible analog of path."
+          ""
+          "Lineage is helpful when a thing is presented without its context."
+          ""
+          "Lineage is presented differently depending on the command.  For example:"
+          "- in `show`, lineage is shown like \"file -> project -> subproject:\""
+          "- in `list-projects`, lineage is shown like \"subproject<-project<-file\""
+          ""
+          "This is done somewhat arbitrarily based on what seems most useful for each command.")))
 
-(let [prune (parser:command
-              "prune"
-              (help "Prune files by moving tagged (`done`, by default) items to the archive."))]
-  (-> "archive"
-      (prune:argument "The file to move pruned items into.")
-      (: :args 1))
+(parser:group
+  "Commands for finding things"
 
-  (-> "-t --tag"
-      (prune:option "Prune items with this tag.")
-      (: :args 1)
-      (: :default "done")))
+  (-> (parser:command
+        "list-files lsf"
+        (help "List the files that would be searched for projects and tasks.")))
 
-(let [show (parser:command
-             "show"
-             (help "Show something (or some things)."
-                   "\"Something\" can be a file, or an item within a file, specified by its path."
-                   "For example:"
-                   "  `show ~/todo.taskpaper:2` will show the second thing in ~/todo.taskpaper"
-                   "  `show ~/todo.taskpaper:2:1` will show the second thing in that thing, &c."))]
-  (-> "path"
-      (show:argument "The path to the thing(s) to show.")
-      (: :args :+))
-  (-> "-l --show-lineage"
-      (show:option "Print lineage above each thing.")
-      (: :args 0)))
+  (let [lsp (parser:command
+              "list-projects lsp"
+              (help "List all projects."))]
 
-(let [fmt (parser:command
-            "format fmt"
-            (help "Print the given file(s) with automatic formatting."
-                  "Writes to standard out by default, but can format the file in-place with -i."))]
-  (-> "file"
-      (fmt:argument "The taskpaper file to format.")
-      (: :args :+))
-  (-> "-i --in-place"
-      (fmt:option "Rewrite the file instead of printing to stdout.")
-      (: :args 0)))
+    (-> "-h --show-header"
+        (lsp:flag "Print a header as the first line."))
+    lsp)
 
-(let [ft (parser:command
-           "find-tagged ft"
-           (help "Print the things with a given tag."))]
-  (-> "tag"
-      (ft:argument "The tag to check for.")
-      (: :args 1))
+  (let [ft (parser:command
+             "find-tagged ft"
+             (help "Print the things with a given tag."))]
+    (-> "tag"
+        (ft:argument "The tag to check for.")
+        (: :args 1))
 
-  (-> "-f --show-filenames"
-      (ft:option "Print tasks grouped by filename.")
-      (: :args 0))
-  (-> "-p --show-paths"
-      (ft:option "Show path for each thing.")
-      (: :args 0)))
+    (-> "-f --show-filenames"
+        (ft:flag "Print tasks grouped by filename."))
+    ft))
 
-(let [args (parser:parse)
+(parser:group
+  "Commands for manipulating things"
+  (let [prune (parser:command
+                "prune"
+                (help "Prune files by moving items to an archive file."
+                      "Moves items tagged with `done` by default."
+                      ""
+                      "Considers files following the rules described in the top-level --dir option."
+                      "Does *not* consider the given archive file (of course)."
+                      ""
+                      "If you use more than one archive file, consider using ~/.lister-ignore."))]
+    (-> "archive"
+        (prune:argument "The file to move pruned items into.")
+        (: :args 1))
+
+    (-> "-t --tag"
+        (prune:option "Prune items with this tag.")
+        (: :args 1)
+        (: :default "done"))
+    prune))
+
+(parser:group
+  "Commands for viewing things"
+  (let [show (parser:command
+               "show"
+               (help "Show something (or some things), specified by path."
+                     "See top-level `--show-paths` flag for more details."))]
+    (-> "path"
+        (show:argument "The path to the thing(s) to show.")
+        (: :args :+))
+    show)
+
+  (let [fmt (parser:command
+              "format fmt"
+              (help "Print the given file(s) with automatic formatting."
+                    "Writes to standard out by default, but can format the file in-place with -i."))]
+    (-> "file"
+        (fmt:argument "The taskpaper file to format.")
+        (: :args :+))
+    (-> "-i --in-place"
+        (fmt:flag "Rewrite the file instead of printing to stdout."))
+    fmt))
+
+(parser:add_help_command)
+(parser:add_complete_command "completion")
+
+(lambda print-help []
+  (print (parser:get_help)))
+
+(let [(ok? args) (parser:pparse)
       dir (. args :dir)]
-  (match (. args :command)
-    "find-tagged" (find_tagged dir args)
-    "format" (format args)
-    "list-files" (list_files dir)
-    "list-projects" (list_projects dir args)
-    "prune" (prune dir args)
-    "show" (show args)))
-
+  (if ok?
+    (match (. args :command)
+      "find-tagged" (find_tagged dir args)
+      "format" (format args)
+      "list-files" (list_files dir)
+      "list-projects" (list_projects dir args)
+      "prune" (prune dir args)
+      "show" (show args))
+    (do
+      (print-help)
+      (os.exit false))))
