@@ -116,19 +116,26 @@ Unixy CLI:
   - figure out how to ignore files
 ```
 
-And... well, that's it.  That's all it does so far.  Cool, right?!
+It does slightly more than this.  `lister help` can tell you more (and
+tell it better).
 
 ### Future plans
 
-Some major missing chunks:
+One major missing chunk is the idea of an inbox.  You could have
+something like `INBOX.taskpaper`, but without facilities for moving
+tasks from there to existing files or projects, there's friction in
+processing it.
 
-- The idea of an inbox.  You could have something like
-  `INBOX.taskpaper`, but without facilities for moving tasks from there
-  to existing files or projects, there's friction in processing it.
-- The idea of an archive.  It would be nice to be able to reap `@done`
-  tasks and put them somewhere else.
+Other things I'd like to do:
 
-I also have grand dreams of adding a curses interface.
+- Some end-to-end CLI testing.
+- Write a real parser for taskpaper.  The regex thing works, but I'm
+  interested in doing it The Right Way.
+- Finish converting the code to Fennel.  Along the way of writing this,
+  I discovered Fennel, and I've been moving things to Fennel as needed.
+- I originally had a grand dream of adding a curses interface.  I'd
+  still *like* to do that, but it might prove totally unnecessary if
+  everything can be done nicely with an editor and/or `fzf`.
 
 ### Installation
 
