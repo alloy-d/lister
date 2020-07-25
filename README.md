@@ -151,17 +151,6 @@ I also considered `skutter` and `kryten`, but in addition to being more
 obscure and harder to type, they were also (surprisingly) more commonly
 in use.
 
-### Code feedback welcome!
-
-Part of my goal with this is to try out Lua.  I've been working on this
-in parallel with reading _Programming in Lua_, and I haven't worked in
-any other Lua codebases.
-
-If you are an experienced Lua person, you might notice that this is the
-code of an inexperienced Lua person.  If you see anything amiss and
-you're feeling generous, I would very much welcome an issue, email, or
-pull request about it!
-
 [taskpaper]: https://guide.taskpaper.com/
 [taskpaper.vim]: https://github.com/davidoc/taskpaper.vim
 [things]: https://culturedcode.com/things/
