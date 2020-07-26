@@ -28,7 +28,8 @@
 
 (lambda rooted? [thing]
   "Is this thing a root?"
-  (not thing.parent))
+  (or (= thing.kind :root)
+      (= thing.kind :file)))
 
 (lambda named? [thing]
   "Does this thing have a name?"
@@ -51,6 +52,8 @@
 
 (local thing-metatable
   {:__index index
+
+   :rooted? rooted?
 
    :crawl traversal.crawl
    :lookup traversal.lookup
