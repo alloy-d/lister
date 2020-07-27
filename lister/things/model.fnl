@@ -45,7 +45,7 @@
 
     (or (= key :path) (= key :lineage))
     (do
-      (traversal.populate_paths thing.parent)
+      (traversal.update-paths! thing.parent)
       (. thing key))
 
     (. (getmetatable thing) key)))
@@ -56,8 +56,10 @@
    :rooted? rooted?
 
    :crawl traversal.crawl
-   :lookup traversal.lookup
-   :populate_paths traversal.populate_paths
+   :look-up traversal.look-up
+   :lookup traversal.look-up ;; TODO: remove
+   :update-paths! traversal.update-paths!
+   :populate_paths traversal.update-paths! ;; TODO: remove
 
    :adopt! mutation.adopt!
    :prune! mutation.prune!
