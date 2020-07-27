@@ -90,6 +90,10 @@ function chunky.parse (chunk)
 
   for line in chunk:gmatch('[^\n]*') do
     local item
+    if line:match("^;;") then
+      goto skip
+    end
+
     item = Project(tplines.parse_header(line))
     item = item or Task(tplines.parse_task(line))
     item = item or Note(tplines.parse_note(line))

@@ -20,15 +20,23 @@ function M.load_file (filename)
   return bless(parsed)
 end
 
-function M.write (self)
+function M.write_to_file (thing, filename, front_matter)
   local _
-  local f, err = io.open(self.name, 'w')
+  local f, err = io.open(filename, 'w')
   if not f then
     return nil, err
   end
 
-  _, err = f:write(printer.format(self))
+  if front_matter then
+    _, err = f:write(front_matter .. "\n")
+    if err then
+      goto cleanup
+    end
+  end
 
+  _, err = f:write(printer.format(thing))
+
+  ::cleanup::
   f:close()
 
   if err then
@@ -36,6 +44,10 @@ function M.write (self)
   end
 
   return true
+end
+
+function M.write (self, front_matter)
+  return M.write_to_file(self, self.name, front_matter)
 end
 
 return M

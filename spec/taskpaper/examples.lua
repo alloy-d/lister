@@ -4,6 +4,7 @@ local Note, Project, Tag, Task = builders.Note, builders.Project, builders.Tag, 
 local examples = {}
 
 examples.chunk = [[
+;; Here is a comment.  The taskpaper parser will ignore it.
 This is a chunk of taskpaper.
 It contains a hierarchy of notes, projects, and tasks.
 - test a top-level task
