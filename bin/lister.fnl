@@ -10,6 +10,8 @@
 (local mutation (require :lister.things.mutation))
 (local tagging (require :lister.things.tagging))
 
+(local process (require :lister.cli.process))
+
 (local {: adopt! : prune!} mutation)
 (local {: has-tag? : set-tag!} tagging)
 
@@ -258,7 +260,15 @@
         (prune:option "Prune items with this tag.")
         (: :args 1)
         (: :default "done"))
-    prune))
+    prune)
+
+  (let [process (parser:command
+                  "process"
+                  (help "Process a file."))]
+    (-> "file"
+        (process:argument "The file to process.")
+        (: :args 1))
+    process))
 
 (parser:group
   "Commands for viewing things"
@@ -296,6 +306,7 @@
       "format" (format args)
       "list-files" (list_files dir)
       "list-projects" (list_projects dir args)
+      "process" (process args)
       "prune" (prune dir args)
       "show" (show args))
     (do

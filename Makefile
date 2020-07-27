@@ -6,7 +6,7 @@ BUSTED_ARGS ?= --helper "spec/setup.lua" # -v
 # 541 == empty do..end block; produced by fennel when importing macros.
 LUACHECK_ARGS ?= --codes --no-max-line-length --ignore 212 311 541
 
-source_dirs := bin lister lister/things spec taskpaper tools
+source_dirs := bin lister lister/cli lister/things spec taskpaper tools
 lua_files := $(shell find $(source_dirs) -name '*.lua')
 fennel_files := $(shell find $(source_dirs) -name '*.fnl' -not -name '*_macros.fnl')
 compiled_lua_files := $(fennel_files:.fnl=.lua)

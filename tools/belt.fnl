@@ -6,6 +6,19 @@
         end (length things)]
     (table.move things start end 1 [])))
 
+(lambda keys [tbl]
+  "Returns a sequence of the keys of `tbl`."
+  (let [result []]
+    (each [key (pairs tbl)]
+      (append result key))
+    result))
+
+(lambda keys-sorted [tbl]
+  "Like `keys`, but also runs the result through table.sort."
+  (let [ks (keys tbl)]
+    (table.sort ks)
+    ks))
+
 (lambda lines [io-object]
   "Returns the lines from `io-object` as a sequence."
   (let [result []]
@@ -29,6 +42,8 @@
     reversed))
 
 {: drop
+ : keys
+ : keys-sorted
  : lines
  : map
  : reverse}
