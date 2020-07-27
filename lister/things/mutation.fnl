@@ -41,11 +41,11 @@
     (tset child :parent nil)
 
     ; Reset positional data on now-orphaned family tree.
-    (traversal.unpopulate_paths child)
+    (traversal.unset-paths! child)
 
     ; Reset positional data on parent's children, which may have changed
     ; position after their sibling's removal.
-    (traversal.populate_paths parent)
+    (traversal.update-paths! parent)
 
     child))
 
