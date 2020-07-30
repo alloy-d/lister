@@ -1,6 +1,5 @@
 (import-macros {: context : test} :spec.busted_macros)
 
-(local things (require :lister.things))
 (local traversal (require :lister.things.traversal))
 
 (local taskpaper (require :taskpaper))
