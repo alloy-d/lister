@@ -6,6 +6,7 @@
 
 (local examples (require :spec.taskpaper.examples))
 
+(local {: assert-basically-same} (require :spec.helpers))
 (local {:assert_subtable assert-subtable} (require :spec.taskpaper.helpers))
 
 (macro example-chunk []
@@ -13,13 +14,6 @@
 
 (macro appendable-item []
   `(things.task {:name "test appending"}))
-
-(lambda assert-basically-same [expected actual ?message]
-        "Asserts, in a half-assed way, that two things are the same.
-        The point: compare two things that differ in parent."
-        (assert.same expected.kind actual.kind ?message)
-        (assert.same expected.name actual.name ?message)
-        (assert.same expected.lines actual.lines ?message))
 
 (context "mutation"
   (context "by direct adoption"
