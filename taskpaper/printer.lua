@@ -1,7 +1,7 @@
 local function indent(depth)
   -- Here's a hacky way to let us use spaces in testing but tabs by
   -- default.  taskpaper.vim only recognizes tasks that are indented
-  -- with tabs,aseemingly for compatibility with old versions of
+  -- with tabs, seemingly for compatibility with old versions of
   -- Taskpaper.
   local indent_string = TASKPAPER_INDENT_STRING or "\t" -- luacheck: ignore
   return depth and string.rep(indent_string, depth) or ""
