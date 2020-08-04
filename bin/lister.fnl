@@ -141,7 +141,7 @@
 
 (lambda show [args]
   "Show thing(s) at `args.path`."
-  (let [paths (map parse_path (. args :path))
+  (let [paths (map parse-path (. args :path))
         show_lineage? (. args :show_lineage)
         file_cache {}]
 
