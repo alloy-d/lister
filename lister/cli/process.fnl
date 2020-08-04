@@ -53,17 +53,14 @@
       (skip child))))
 
 (lambda edit [target {: visited!}]
-  (local editor (os.getenv :EDITOR))
+  (local editor (or (os.getenv :LISTER_EDITOR)
+                    (os.getenv :EDITOR)))
   (when (not editor)
-    (error "$EDITOR is unset"))
+    (error "Neither $EDITOR nor $LISTER_EDITOR is set"))
 
   (local filename (os.tmpname))
 
-  (filer.write_to_file target filename
-                       (table.concat
-                         [";; vim: ft=taskpaper"
-                          (string.format ";; editing chunk in %s" (table.concat target.lineage " -> "))]
-                         "\n"))
+  (filer.write_to_file target filename)
   (os.execute (string.format "%s %s" editor filename))
   (let [replacement (taskpaper.load_file filename)]
     (print (taskpaper.format replacement))
