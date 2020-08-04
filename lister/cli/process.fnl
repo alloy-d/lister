@@ -167,7 +167,10 @@
   (local visitor (traversal.visitor tree))
 
   (each [item visitor.visit]
-    (when (not (things.rooted? item))
+    (when (not (or (things.rooted? item)
+                   (and (= item.kind :note)
+                        item.parent
+                        (= item.parent.kind :task))))
       (print (taskpaper.format item))
       (read-choice (applicable-actions item {:visited! visitor.visited!})))))
 
