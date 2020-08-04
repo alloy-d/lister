@@ -2,7 +2,7 @@
 (local taskpaper (require :taskpaper))
 (local {:write write!} (require :taskpaper.filer))
 
-(local {: parse_path : filter} (require :lister.things.traversal))
+(local {: parse-path : filter} (require :lister.things.traversal))
 
 (local {: find_files} (require :lister.finding))
 

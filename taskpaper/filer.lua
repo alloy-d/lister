@@ -16,6 +16,7 @@ function M.load_file (filename)
   local parsed = chunky.parse(contents)
   parsed.kind = "file"
   parsed.name = filename
+  parsed.path = filename
 
   return bless(parsed)
 end
