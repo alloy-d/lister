@@ -1,5 +1,5 @@
 (import-macros {: append} :tools.belt_macros)
-(local {: keys-sorted} (require :tools.belt))
+(local {: read-choice : yes-or-no?} (require :tools.ui))
 
 (local taskpaper (require :taskpaper))
 (local filer (require :taskpaper.filer))
@@ -7,18 +7,21 @@
 (local mutation (require :lister.things.mutation))
 (local traversal (require :lister.things.traversal))
 
-(var actions nil)
+;; Some helpers:
+(lambda save! [target]
+  "Writes the file that contains `target`."
+  (filer.write (things.root-of target)))
 
-;; TODO: move to toolbelt.
-(lambda yes-or-no? [prompt]
-  "Prints `prompt`. Gets a clear \"yes\" or \"no\" from input. Returns true or false."
-  (io.write prompt)
-  (io.write " [y/n] ")
-  (let [input (io.read :l)]
-    (if
-      (= input :y) true
-      (= input :n) false
-      (yes-or-no? prompt))))
+(lambda skip-thoroughly [item skip]
+  "Marks `item` and its children as using the given `skip` function."
+  (skip item)
+  (when item.children
+    (each [_ child (ipairs item.children)]
+      (skip child))))
+
+
+;; Actions and action management:
+(var actions nil)
 
 (lambda specialized-action [action target ?context]
   "Takes an action and returns an action whose `perform` field is
@@ -41,18 +44,12 @@
       (tset result key (specialized-action action target ?context))))
   result)
 
-(lambda save! [target]
-  "Writes the file that contains `target`."
-  (filer.write (things.root-of target)))
-
-(lambda skip-thoroughly [item skip]
-  "Marks `item` and its children as using the given `skip` function."
-  (skip item)
-  (when item.children
-    (each [_ child (ipairs item.children)]
-      (skip child))))
-
 (lambda edit [target {: visited!}]
+  "Opens `target` in $LISTER_EDITOR or $EDITOR, and replaces it with the
+  results.  Marks everything in the replacement as visited, so it will
+  not be further processed.
+
+  Saves the processed file after doing the replacement."
   (local editor (or (os.getenv :LISTER_EDITOR)
                     (os.getenv :EDITOR)))
   (when (not editor)
@@ -80,10 +77,12 @@
           false)))))
 
 (lambda mark-done [target]
+  "Marks an item as done.  Writes the processed file afterward."
   (target:set-tag! :done (os.date "%Y-%m-%d"))
   (save! target))
 
 (lambda skip-project [target {: visited!}]
+  "Marks a project and all its children as visited."
   (skip-thoroughly target visited!)
   true)
 
@@ -106,58 +105,6 @@
        :desc "skip all remaining children of this project"
        :applies-to? #(= $1.kind :project)
        :perform skip-project}})
-
-(lambda explain [choices]
-  "Prints an explanation of the given choices."
-  (each [_ key (ipairs (keys-sorted choices))]
-    (print key (. choices key :name) (. choices key :desc)))
-  (print)
-  false)
-
-(lambda read-choice [choices]
-  "Prompts the user to choose one of `choices`, then runs it if possible.
-
-  `choices` is a table mapping single-character strings to choice tables.
-
-  Something like:
-      {:a {:name :choice-a
-           :desc \"choose a\"
-           :perform (fn [] (print \"you chose a!\"))}
-       :b {:name :choice-b
-           :desc \"choose b\"}}
-
-  For this case, it would prompt the user:
-
-      What would you like to do? [a,b,?]
-
-  Where entering 'a' or 'b' calls the `perform` function associated with
-  that choice, if any, and entering '?' will cause it to print a listing
-  of the choices."
-  (local choice-keys (keys-sorted choices))
-  (table.insert choice-keys :?)
-
-  (io.write
-    (string.format "What would you like to do? [%s] "
-                   (table.concat choice-keys ",")))
-
-  (let [input (io.read :l)
-        choice (. choices input)]
-    (if
-      choice
-      (when choice.perform
-        (let [continue? (choice.perform)]
-          (when (not continue?)
-            (read-choice choices))))
-
-      (= input :?)
-      (do
-        (explain choices)
-        (read-choice choices))
-
-      (do
-        (when input
-          (print input "is not a valid choice." "Try again."))
-        (read-choice choices)))))
 
 (lambda process [{: file}]
   (local tree (taskpaper.load_file file))
