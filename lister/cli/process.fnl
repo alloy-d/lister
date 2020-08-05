@@ -1,5 +1,6 @@
 (import-macros {: append} :tools.belt_macros)
 (local {: read-choice : yes-or-no?} (require :tools.ui))
+(local {: choose-project} (require :lister.utilities))
 
 (local taskpaper (require :taskpaper))
 (local filer (require :taskpaper.filer))
@@ -18,7 +19,6 @@
   (when item.children
     (each [_ child (ipairs item.children)]
       (skip child))))
-
 
 ;; Actions and action management:
 (var actions nil)
@@ -86,6 +86,14 @@
   (skip-thoroughly target visited!)
   true)
 
+(lambda move [target]
+  (let [destination (choose-project)
+        processing-root (things.root-of target)]
+    (when destination
+      (mutation.prune! target)
+      (mutation.adopt! destination target)
+      (and (save! processing-root) (save! destination)))))
+
 (set actions
   {:n {:name :next
        :desc "process next thing in traversal order, which may be a child of this"}
@@ -101,6 +109,10 @@
        :desc "mark this as done"
        :applies-to? #(= $1.kind :task)
        :perform mark-done}
+   :m {:name :move
+       :desc "move to another project"
+       :applies-to? #(not (things.rooted? $1))
+       :perform move}
    :s {:name :skip
        :desc "skip all remaining children of this project"
        :applies-to? #(= $1.kind :project)
