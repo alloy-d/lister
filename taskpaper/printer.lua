@@ -91,6 +91,17 @@ format = function (thing, depth)
   return formatter(thing, depth)
 end
 
+-- Formats a taskpaper thing, indented with spaces.
+local function format_with_space_indent (thing, depth)
+  local previous_indent_string = TASKPAPER_INDENT_STRING
+  TASKPAPER_INDENT_STRING = "  "
+  local result = format(thing, depth)
+  TASKPAPER_INDENT_STRING = previous_indent_string
+  return result
+end
+
+
 return {
   format = format,
+  format_with_space_indent = format_with_space_indent,
 }

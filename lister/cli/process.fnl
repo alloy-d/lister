@@ -8,6 +8,8 @@
 (local mutation (require :lister.things.mutation))
 (local traversal (require :lister.things.traversal))
 
+(local {:format_with_space_indent format-spaced} (require :taskpaper.printer))
+
 ;; Some helpers:
 (lambda save! [target]
   "Writes the file that contains `target`."
@@ -19,6 +21,9 @@
   (when item.children
     (each [_ child (ipairs item.children)]
       (skip child))))
+
+(lambda print-taskpaper [thing]
+  (print (format-spaced thing)))
 
 ;; Actions and action management:
 (var actions nil)
@@ -60,7 +65,7 @@
   (filer.write_to_file target filename)
   (os.execute (string.format "%s %s" editor filename))
   (let [replacement (taskpaper.load_file filename)]
-    (print (taskpaper.format replacement))
+    (print-taskpaper replacement)
     (let [ok? (yes-or-no? "Use this as replacement?")]
       (if ok?
         (let [root (things.root-of target)]
@@ -127,7 +132,7 @@
                    (and (= item.kind :note)
                         item.parent
                         (= item.parent.kind :task))))
-      (print (taskpaper.format item))
+      (print-taskpaper item)
       (read-choice (applicable-actions item {:visited! visitor.visited!})))))
 
 process
