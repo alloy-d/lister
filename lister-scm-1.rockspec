@@ -15,12 +15,12 @@ description = {
 }
 supported_platforms = {"unix"}
 dependencies = {
-  "lua ~> 5.3",
+  "lua >= 5.3",
   "argparse",
 }
 build_dependencies = {
   "busted",
-  "fennel = 0.4.2",
+  "fennel ~> 0.4.2",
   "luacheck",
 }
 build = {
