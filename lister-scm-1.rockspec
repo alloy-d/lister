@@ -21,7 +21,6 @@ dependencies = {
 build_dependencies = {
   "busted",
   "fennel ~> 0.4.2",
-  "luacheck",
 }
 build = {
   type = "make",
