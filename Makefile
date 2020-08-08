@@ -44,7 +44,6 @@ test: $(compiled_lua_files)
 	busted ${BUSTED_ARGS}
 
 ci:
-	$(MAKE) luacheck
 	$(MAKE) test BUSTED_ARGS="$(BUSTED_ARGS) --shuffle"
 
 watch-test:
