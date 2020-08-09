@@ -20,7 +20,7 @@ dependencies = {
 }
 build_dependencies = {
   "busted",
-  "fennel ~> 0.4.2",
+  "fennel ~> 0.5.0",
 }
 build = {
   type = "make",
