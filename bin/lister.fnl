@@ -13,7 +13,7 @@
 (local process (require :lister.cli.process))
 
 (local {: adopt! : prune!} mutation)
-(local {: has-tag? : set-tag!} tagging)
+(local {: has-tag? : has-any-tag? : set-tag!} tagging)
 
 (local {: map : reverse : drop} (require :tools.belt))
 (import-macros {: append} :tools.belt_macros)
@@ -54,7 +54,7 @@
 
 (lambda find_tagged [dir args]
   "Print all the things tagged with `args.tag` under `dir`"
-  (local {: tag
+  (local {:tag tag-names
           :show_filenames show-filenames?
           :show_paths show-paths?} args)
 
@@ -69,12 +69,13 @@
   (each-root [root dir]
     (when show-filenames?
       (print (.. root.name ":")))
-    (each [item (filter root #(has-tag? $1 tag))]
+    (each [item (filter root #(has-any-tag? $1 tag-names))]
       (show item))
     (when show-filenames? (print))))
 
-(lambda prune [dir {: tag :archive archive-name}]
-  "Move all the things with `tag` under `dir` to the file `archive`."
+(lambda prune [dir {:tag tag-names :archive archive-name :dry_run ?dry-run?}]
+  "Move all the things with any of `tag-names` under `dir` to the file
+  `archive`."
 
   (local archive (or (taskpaper.load_file archive-name)
                      (things.file {:name archive-name})))
@@ -92,8 +93,10 @@
 
   (each-root [root dir]
     (when (not= root.name archive-name)
-      (each [item (filter root #(has-tag? $1 tag))]
-        (append moveable item))))
+      (each [item (filter root #(has-any-tag? $1 tag-names))]
+        (if ?dry-run?
+          (print "would archive" (taskpaper.format item))
+          (append moveable item)))))
 
   (each [_ thing (ipairs moveable)]
     (changed! (things.root-of thing))
@@ -234,8 +237,8 @@
              "find-tagged ft"
              (help "Print the things with a given tag."))]
     (-> "tag"
-        (ft:argument "The tag to check for.")
-        (: :args 1))
+        (ft:argument "The tag(s) to check for. If given multiple times, matches any given tag.")
+        (: :args :+))
 
     (-> "-f --show-filenames"
         (ft:flag "Print tasks grouped by filename."))
@@ -257,9 +260,12 @@
         (: :args 1))
 
     (-> "-t --tag"
-        (prune:option "Prune items with this tag.")
-        (: :args 1)
-        (: :default "done"))
+        (prune:option "Prune items with this tag. If given multiple times, matches any given tag.")
+        (: :args :+)
+        (: :default [:done :cancelled :moved]))
+
+    (-> "--dry-run"
+        (prune:flag "Just print items that would be moved."))
     prune)
 
   (let [process (parser:command

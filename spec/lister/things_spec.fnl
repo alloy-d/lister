@@ -18,6 +18,11 @@
     (test "has-tag? returns true"
       (assert.true (tagging.has-tag? (sample-task) :tag)))
 
+    (test "has-any-tag? returns true if given a list with that tag"
+      (assert.true (tagging.has-any-tag? (sample-task) [:tag :no-tag :again-no-tag]))
+      (assert.true (tagging.has-any-tag? (sample-task) [:no-tag :tag :again-no-tag]))
+      (assert.true (tagging.has-any-tag? (sample-task) [:no-tag :again-no-tag :tag])))
+
     (test "find-tag returns true and nil"
       (let [(found vals) (tagging.find-tag (sample-task) :tag)]
         (assert.true found "first value is true")
@@ -26,6 +31,8 @@
   (context "when a thing does not have a tag"
     (test "has-tag? returns false"
       (assert.false (tagging.has-tag? (sample-task) :missing-tag)))
+    (test "has-any-tag? returns false when given a list with only that tag"
+      (assert.false (tagging.has-any-tag? (sample-task) [:missing-tag])))
     (test "find-tag returns nil"
       (assert.nil (tagging.find-tag (sample-task) :missing-tag))))
 
@@ -49,6 +56,9 @@
 
     (test "has-tag? returns false"
       (assert.false (tagging.has-tag? (sample-task) :some-tag)))
+
+    (test "has-any-tag? returns false"
+      (assert.false (tagging.has-any-tag? (sample-task) [:some-tag])))
 
     (test "find-tag returns nothing"
       (assert.nil (tagging.find-tag (sample-task) :some-tag)))))
