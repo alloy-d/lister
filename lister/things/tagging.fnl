@@ -69,6 +69,16 @@
       (contains-value? vals 1)
       false)))
 
+(lambda has-any-tag? [thing tag-names]
+  "Does `thing` have at least one of the tags in `tag-names`?"
+  (fn check-for-tag [index]
+    (if
+      (> index (length tag-names)) false
+      (has-tag? thing (. tag-names index)) true
+      (check-for-tag (+ 1 index))))
+
+  (check-for-tag 1))
+
 (lambda remove-tag! [thing tag-name]
   "Removes `tag` from `thing`."
   (let [(location _) (find thing.tags #(= $1.name tag-name))]
@@ -86,6 +96,7 @@
 {: tag
  : find-tag
  : has-tag?
+ : has-any-tag?
 
  : set-tag!
  : remove-tag!}
